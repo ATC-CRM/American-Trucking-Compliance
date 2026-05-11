@@ -1,0 +1,1327 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>American Trucking Compliance — CRM</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+--sb:#0C3B6E;--sb-muted:#7EB3E8;--header-bg:#1A6BC4;
+--page-bg:#F0F4FA;--card-bg:#fff;--card-border:#C8D8EE;
+--text-primary:#1a2535;--text-secondary:#4a5e7a;--text-muted:#7a8fa8;
+--blue:#185FA5;--blue-light:#E6F1FB;--blue-dark:#0C3B6E;
+--green:#2E7D32;--green-light:#E8F5E9;
+--amber:#B45309;--amber-light:#FEF3C7;
+--red:#C62828;--red-light:#FFEBEE;
+--teal:#0F6E56;--teal-light:#E1F5EE;
+--purple:#534AB7;--purple-light:#EEEDFE;
+--input-bg:#F0F6FF;--input-border:#7EB3E8;--input-focus:#185FA5;
+--radius:8px;--radius-lg:12px;
+}
+body{font-family:system-ui,-apple-system,sans-serif;font-size:13px;background:var(--page-bg);min-height:100vh}
+#app{display:flex;min-height:100vh}
+.sidebar{width:230px;background:var(--sb);display:flex;flex-direction:column;position:fixed;top:0;left:0;height:100vh;z-index:100;overflow-y:auto}
+.sb-logo{padding:14px 16px 12px;border-bottom:1px solid rgba(255,255,255,0.1);text-align:center}
+.sb-logo-img{width:80px;height:80px;object-fit:contain;border-radius:10px;margin-bottom:6px}
+.sb-logo-placeholder{width:80px;height:80px;background:#1A6BC4;border-radius:10px;display:flex;align-items:center;justify-content:center;margin:0 auto 6px}
+.sb-logo h1{font-size:11px;font-weight:700;color:#fff;line-height:1.3}
+.sb-logo p{font-size:9px;color:var(--sb-muted);margin-top:2px}
+.sb-nav{padding:8px 0;flex:1}
+.sb-section{font-size:9px;font-weight:700;color:var(--sb-muted);letter-spacing:1px;padding:10px 16px 3px;text-transform:uppercase}
+.nav-item{display:flex;align-items:center;gap:9px;padding:8px 16px;cursor:pointer;font-size:12px;color:var(--sb-muted);border-left:3px solid transparent}
+.nav-item:hover{background:rgba(255,255,255,0.08);color:#fff}
+.nav-item.active{background:rgba(255,255,255,0.12);color:#fff;border-left-color:#60A5FA;font-weight:600}
+.nav-badge{margin-left:auto;background:#E24B4A;color:#fff;font-size:9px;padding:2px 6px;border-radius:10px;font-weight:700}
+.nav-badge-blue{background:#1A6BC4}
+.sb-user{padding:10px 16px;border-top:1px solid rgba(255,255,255,0.1)}
+.sb-user-name{font-size:12px;font-weight:600;color:#fff}
+.sb-user-role{font-size:10px;color:var(--sb-muted);margin-top:1px}
+.sb-signout{margin-top:8px;padding:5px 10px;background:rgba(255,255,255,0.1);color:var(--sb-muted);border:1px solid rgba(255,255,255,0.15);border-radius:6px;cursor:pointer;font-size:10px;width:100%}
+.sb-signout:hover{background:rgba(255,255,255,0.18);color:#fff}
+.main{margin-left:230px;flex:1;display:flex;flex-direction:column;min-height:100vh}
+.page-header{background:var(--header-bg);padding:12px 20px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;position:sticky;top:0;z-index:50}
+.page-header h2{font-size:15px;font-weight:700;color:#fff}
+.page-header-sub{font-size:11px;color:rgba(255,255,255,0.7)}
+.page-body{padding:16px;flex:1}
+.btn{padding:7px 14px;border-radius:var(--radius);border:1.5px solid var(--card-border);background:var(--card-bg);color:var(--text-primary);cursor:pointer;font-size:12px;font-weight:600}
+.btn:hover{background:#EEF4FF}
+.btn-primary{background:var(--blue);color:#fff;border-color:var(--blue)}
+.btn-primary:hover{background:#0C447C;color:#fff}
+.btn-success{background:var(--green);color:#fff;border-color:var(--green)}
+.btn-success:hover{background:#1B5E20;color:#fff}
+.btn-danger-solid{background:var(--red);color:#fff;border-color:var(--red)}
+.btn-danger-solid:hover{background:#B71C1C;color:#fff}
+.btn-sm{padding:5px 10px;font-size:11px}
+.btn-danger{color:var(--red);border-color:#FFCDD2}
+.btn-danger:hover{background:#FFEBEE}
+.btn-amber{background:var(--amber);color:#fff;border-color:var(--amber)}
+.btn-amber:hover{background:#92400e;color:#fff}
+.card{background:var(--card-bg);border:1.5px solid var(--card-border);border-radius:var(--radius-lg);margin-bottom:14px;overflow:hidden}
+.card-header{padding:10px 16px;background:#F0F6FF;border-bottom:1.5px solid var(--card-border);display:flex;align-items:center;justify-content:space-between}
+.card-header h3{font-size:13px;font-weight:700;color:var(--text-primary)}
+.card-body{padding:14px 16px}
+.metric-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:14px}
+.metric{background:var(--card-bg);border:1.5px solid var(--card-border);border-radius:var(--radius-lg);padding:12px;text-align:center;border-top:4px solid var(--blue)}
+.metric.danger{border-top-color:var(--red)}
+.metric.warning{border-top-color:#EF9F27}
+.metric.info{border-top-color:#378ADD}
+.metric.success{border-top-color:var(--green)}
+.metric-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:var(--text-muted);margin-bottom:4px}
+.metric-value{font-size:26px;font-weight:700;color:var(--text-primary)}
+.metric.danger .metric-value{color:var(--red)}
+.metric.warning .metric-value{color:var(--amber)}
+.metric.info .metric-value{color:var(--blue)}
+.badge{display:inline-block;padding:2px 8px;border-radius:20px;font-size:10px;font-weight:700}
+.badge-danger{background:var(--red-light);color:var(--red)}
+.badge-warning{background:var(--amber-light);color:var(--amber)}
+.badge-success{background:var(--green-light);color:var(--green)}
+.badge-info{background:var(--blue-light);color:var(--blue-dark)}
+.badge-gray{background:#F0F4FA;color:var(--text-muted);border:1px solid #C8D8EE}
+.badge-teal{background:var(--teal-light);color:var(--teal)}
+.badge-purple{background:var(--purple-light);color:var(--purple)}
+.badge-compliant{background:#E8F5E9;color:#2E7D32;border:1px solid #A5D6A7}
+.badge-noncompliant{background:#FFEBEE;color:#C62828;border:1px solid #FFCDD2}
+.table{width:100%;border-collapse:collapse;table-layout:fixed}
+.table th{text-align:left;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:var(--text-muted);padding:8px 10px;background:#F0F6FF;border-bottom:2px solid var(--card-border)}
+.table td{padding:9px 10px;border-bottom:1px solid #E8F0FA;font-size:12px;vertical-align:middle;overflow:hidden;text-overflow:ellipsis}
+.table tr:hover td{background:#F5F9FF}
+.table tr:last-child td{border-bottom:none}
+.form-group{margin-bottom:12px}
+.form-label{display:block;font-size:11px;font-weight:700;color:var(--text-secondary);margin-bottom:4px;text-transform:uppercase;letter-spacing:0.3px}
+.form-input{width:100%;padding:8px 11px;border:2px solid var(--input-border);border-radius:var(--radius);background:var(--input-bg);color:var(--text-primary);font-size:13px}
+.form-input:focus{outline:none;border-color:var(--input-focus);background:#fff}
+.form-input::placeholder{color:var(--text-muted)}
+.form-select{width:100%;padding:8px 11px;border:2px solid var(--input-border);border-radius:var(--radius);background:var(--input-bg);color:var(--text-primary);font-size:13px}
+.form-select:focus{outline:none;border-color:var(--input-focus)}
+.form-textarea{width:100%;padding:8px 11px;border:2px solid var(--input-border);border-radius:var(--radius);background:var(--input-bg);color:var(--text-primary);font-size:13px;resize:vertical}
+.form-textarea:focus{outline:none;border-color:var(--input-focus);background:#fff}
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.form-grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}
+.tab-bar{display:flex;border-bottom:2px solid var(--card-border);margin-bottom:14px;background:var(--card-bg);border-radius:var(--radius-lg) var(--radius-lg) 0 0;overflow:hidden;flex-wrap:wrap}
+.tab{padding:9px 14px;font-size:11px;font-weight:700;cursor:pointer;color:var(--text-muted);border-bottom:3px solid transparent;margin-bottom:-2px;text-transform:uppercase;letter-spacing:0.3px}
+.tab:hover{color:var(--text-primary);background:#F0F6FF}
+.tab.active{color:var(--blue);border-bottom-color:var(--blue);background:#EEF4FF}
+.alert-row{display:flex;align-items:center;gap:10px;padding:8px 12px;border-radius:var(--radius);margin-bottom:6px;background:var(--card-bg);border:1.5px solid var(--card-border);cursor:pointer}
+.alert-row:hover{background:#F5F9FF;border-color:var(--blue)}
+.alert-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
+.modal-overlay{position:fixed;inset:0;background:rgba(10,30,60,0.6);display:flex;align-items:flex-start;justify-content:center;z-index:1000;padding:20px 16px;overflow-y:auto}
+.modal{background:#fff;border-radius:var(--radius-lg);border:2px solid var(--card-border);width:100%;max-width:640px}
+.modal-lg{max-width:820px}
+.modal-header{padding:12px 18px;background:var(--header-bg);border-radius:var(--radius-lg) var(--radius-lg) 0 0;display:flex;align-items:center;justify-content:space-between}
+.modal-header h3{font-size:14px;font-weight:700;color:#fff}
+.modal-close{background:rgba(255,255,255,0.15);border:none;color:#fff;width:26px;height:26px;border-radius:6px;cursor:pointer;font-size:14px}
+.modal-close:hover{background:rgba(255,255,255,0.25)}
+.modal-body{padding:16px 18px}
+.modal-footer{padding:10px 18px;border-top:1.5px solid var(--card-border);display:flex;justify-content:flex-end;gap:8px;background:#F0F6FF;border-radius:0 0 var(--radius-lg) var(--radius-lg)}
+.login-wrap{display:flex;align-items:center;justify-content:center;min-height:100vh;background:linear-gradient(135deg,#0C3B6E 0%,#1A6BC4 100%)}
+.login-card{background:#fff;border-radius:16px;padding:32px;width:380px;border:2px solid var(--card-border)}
+.chip{display:inline-flex;align-items:center;padding:2px 7px;border-radius:20px;font-size:10px;font-weight:700;margin:2px}
+.chip-dmv{background:#DBEAFE;color:#1e40af}
+.chip-carb{background:#D1FAE5;color:#065f46}
+.chip-irs{background:#EDE9FE;color:#4c1d95}
+.chip-mcs{background:#FEF3C7;color:#92400e}
+.chip-mc{background:#FCE7F3;color:#9D174D}
+.chip-epn{background:#E0F2FE;color:#0369A1}
+.chip-vin{background:#F3E8FF;color:#6D28D9}
+.chip-acm{background:#ECFDF5;color:#065F46}
+.paid-pill{cursor:pointer;user-select:none;display:inline-block;padding:3px 9px;border-radius:20px;font-size:10px;font-weight:700;border:none}
+.paid-pill.paid{background:var(--green-light);color:var(--green)}
+.paid-pill.unpaid{background:#FEE2E2;color:#991B1B}
+.due-block{background:#F0F6FF;border:1.5px solid var(--card-border);border-radius:var(--radius);padding:10px 12px}
+.due-block-title{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.4px;color:var(--text-muted);margin-bottom:3px}
+.due-block-date{font-size:13px;font-weight:700;color:var(--text-primary);margin-bottom:5px}
+.activity-item{display:flex;gap:10px;margin-bottom:12px;align-items:flex-start}
+.activity-icon{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:13px}
+.notif{position:fixed;top:16px;right:16px;padding:10px 18px;border-radius:var(--radius);font-size:13px;font-weight:600;z-index:9999;opacity:0;pointer-events:none;transition:opacity 0.3s}
+.notif.show{opacity:1}
+.doc-drop{border:2px dashed var(--input-border);border-radius:var(--radius-lg);padding:24px;text-align:center;background:var(--input-bg);cursor:pointer}
+.doc-drop:hover,.doc-drop.dragover{border-color:var(--blue);background:#EEF4FF}
+.doc-item{display:flex;align-items:center;gap:10px;padding:9px 12px;background:var(--card-bg);border:1.5px solid var(--card-border);border-radius:var(--radius);margin-bottom:7px}
+.doc-icon{width:32px;height:32px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;flex-shrink:0}
+.doc-icon-pdf{background:#FFEBEE;color:#C62828}
+.doc-icon-img{background:#E3F2FD;color:#1565C0}
+.doc-icon-doc{background:#E8EAF6;color:#3949AB}
+.doc-icon-xls{background:#E8F5E9;color:#2E7D32}
+.doc-icon-other{background:#F3E5F5;color:#6A1B9A}
+.gdrive-badge{display:inline-flex;align-items:center;gap:4px;padding:3px 8px;border-radius:20px;font-size:10px;font-weight:700;background:#E8F5E9;color:#2E7D32}
+.gdrive-pending{background:#FEF3C7;color:#B45309}
+.svc-check{display:inline-flex;align-items:center;gap:6px;padding:6px 10px;border:2px solid var(--card-border);border-radius:var(--radius);cursor:pointer;background:var(--card-bg);font-size:11px;font-weight:600;margin:3px}
+.svc-check:hover{border-color:var(--blue);background:#F0F6FF}
+.svc-check.checked{border-color:var(--blue);background:#EEF4FF;color:var(--blue)}
+.svc-check input{accent-color:var(--blue);width:13px;height:13px}
+.checklist-item{display:flex;align-items:flex-start;gap:8px;padding:7px 10px;border:1.5px solid var(--card-border);border-radius:var(--radius);margin-bottom:5px;background:var(--card-bg)}
+.checklist-item input[type=checkbox]{accent-color:var(--blue);width:14px;height:14px;margin-top:1px;flex-shrink:0}
+.checklist-item.checked-item{background:#F0FFF4;border-color:#A5D6A7;opacity:0.8}
+.checklist-item label{font-size:12px;cursor:pointer;flex:1}
+.section-divider{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:var(--text-muted);padding:10px 0 5px;display:flex;align-items:center;gap:8px}
+.section-divider::after{content:'';flex:1;height:1px;background:var(--card-border)}
+.compliance-bar{display:flex;align-items:center;gap:6px;padding:6px 10px;border-radius:var(--radius);margin-bottom:5px;border:1.5px solid var(--card-border)}
+.compliance-bar.compliant{background:#F0FFF4;border-color:#A5D6A7}
+.compliance-bar.noncompliant{background:#FFF5F5;border-color:#FFCDD2}
+.compliance-bar.pending{background:#FFFBEB;border-color:#FCD34D}
+.doc-preview-wrap{position:fixed;inset:0;background:rgba(0,0,0,0.75);z-index:2000;display:flex;align-items:center;justify-content:center;padding:20px}
+.doc-preview-inner{background:#fff;border-radius:12px;width:90%;max-width:900px;height:85vh;display:flex;flex-direction:column}
+.doc-preview-header{padding:12px 16px;background:var(--header-bg);border-radius:12px 12px 0 0;display:flex;align-items:center;justify-content:space-between}
+.doc-preview-header span{color:#fff;font-weight:700;font-size:13px}
+.doc-preview-body{flex:1;overflow:hidden;border-radius:0 0 12px 12px}
+.doc-preview-body iframe{width:100%;height:100%;border:none}
+.doc-preview-body .img-preview{width:100%;height:100%;object-fit:contain;padding:12px}
+.unlinked-warning{background:#FEF3C7;border:1.5px solid #FCD34D;border-radius:var(--radius);padding:10px 14px;margin-bottom:10px;font-size:12px;color:var(--amber)}
+.carb-auto-hint{background:#E8F5E9;border:1.5px solid #A5D6A7;border-radius:var(--radius);padding:8px 12px;font-size:11px;color:var(--green);margin-top:5px}
+</style>
+</head>
+<body>
+<div id="app-root"></div>
+<div id="notif" class="notif"></div>
+<div id="doc-preview-root"></div>
+
+<script>
+const DB_KEY='atc_crm_v3';
+const ALL_SVCS=['dmv','carb','irs2290','mcs150','epn','mc_permit','vin_verify','annual_compliance'];
+const SL={dmv:'DMV Services',carb:'Clean Truck Check',irs2290:'IRS Form 2290',mcs150:'MCS-150',epn:'EPN',mc_permit:'MC Permit',vin_verify:'VIN Verification',annual_compliance:'Annual Compliance Mgmt'};
+const SVC_CHIP={dmv:'chip-dmv',carb:'chip-carb',irs2290:'chip-irs',mcs150:'chip-mcs',mc_permit:'chip-mc',epn:'chip-epn',vin_verify:'chip-vin',annual_compliance:'chip-acm'};
+
+// API Configuration defaults
+const DEF_API_CONFIG={
+  twilio:{accountSid:'',authToken:'',phoneNumber:'',enabled:false},
+  googleDrive:{serviceAccountEmail:'',privateKey:'',enabled:false},
+  googleSheets:{spreadsheetId:'',serviceAccountEmail:'',privateKey:'',enabled:false},
+  gmail:{clientId:'',clientSecret:'',refreshToken:'',enabled:false},
+  square:{accessToken:'',enabled:false}
+};
+
+// CARB compliance deadline maps
+// CA Registered: DMV expiry month -> two testing deadline months
+const CARB_CA={
+  1:['Jan','Jul'],2:['Feb','Aug'],3:['Mar','Sep'],4:['Apr','Oct'],
+  5:['May','Nov'],6:['Jun','Dec'],7:['Jan','Jul'],8:['Feb','Aug'],
+  9:['Mar','Sep'],10:['Apr','Oct'],11:['May','Nov'],12:['Jun','Dec']
+};
+// Non-CA: last digit of VIN -> two testing deadline months
+const CARB_NOCA={
+  0:['Apr','Oct'],1:['May','Nov'],2:['Jun','Dec'],3:['Jan','Jul'],
+  4:['Feb','Aug'],5:['Mar','Sep'],6:['Apr','Oct'],7:['May','Nov'],
+  8:['Jun','Dec'],9:['Jan','Jul']
+};
+const MONTH_NAMES=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+const MONTH_NUM={Jan:1,Feb:2,Mar:3,Apr:4,May:5,Jun:6,Jul:7,Aug:8,Sep:9,Oct:10,Nov:11,Dec:12};
+
+// MCS-150 biennial schedule: last digit of USDOT -> filing month
+const MCS150_MONTH={1:'January',2:'February',3:'March',4:'April',5:'May',6:'June',7:'July',8:'August',9:'September',0:'October'};
+
+// Document checklists per service
+const DOC_CHECKLISTS={
+  dmv_renewal:{label:'DMV Standard Renewal',items:['Current CA vehicle registration card','Proof of insurance (CA)','Smog certificate (if required)','Payment for registration fees','Owner ID/driver license']},
+  dmv_new:{label:'DMV New Registration',items:['Completed REG 343 Application','Certificate of Title or Manufacturer Certificate of Origin','Proof of insurance','Weight certification or weight slip','Payment of fees and use tax']},
+  dmv_title:{label:'Title Transfer',items:['Signed title from seller','REG 343 Application for Title','Bill of sale','Odometer disclosure statement','Payment for transfer fees and use tax','Proof of insurance']},
+  dmv_vin:{label:'VIN Verification',items:['Vehicle identification number (VIN) visible on vehicle','REG 343 or REG 31 form','Proof of ownership (title or registration)','Valid ID of applicant','Fees for VIN verification']},
+  dmv_mcp:{label:'Motor Carrier Permit',items:['Business name and address','USDOT number','CA carrier identification number','Proof of insurance (MCP-65 or equivalent)','Carrier type and commodity info','Payment of MCP fees']},
+  dmv_epn:{label:'EPN (Established Place of Business)',items:['Business license','Physical address verification','REG 31 form','CALER authorization documentation','Proof of bond or self-insurance']},
+  irs2290:{label:'IRS Form 2290',items:['Vehicle Identification Number (VIN)','First use month of vehicle','Gross taxable weight of vehicle','Employer Identification Number (EIN)','Prior year 2290 Schedule 1 (if applicable)','Payment method for Heavy Vehicle Use Tax']},
+  carb:{label:'CARB Clean Truck Check',items:['Vehicle VIN number','License plate number','Engine model year','Engine family name (from engine label)','CARB registration/fleet ID','Proof of current smog or certification (if applicable)','Testing appointment confirmation']},
+  mcs150:{label:'MCS-150 Biennial Update',items:['USDOT number','Legal business name','Principal place of business address','Operation type and cargo classification','Number of power units and drivers','EIN or SSN','Signature of authorized person']}
+};
+
+let S={user:null,view:'login',tab:0,filter:'',selectedClient:null,modal:null,clients:[],trucks:[],activities:[],reminders:[],docs:[],users:[],docTemplates:[],smsTemplates:[],apiConfig:{}};
+
+// Default SMS text message templates
+const DEF_SMS_TEMPLATES=[
+  {id:'sms1',name:'DMV Renewal Reminder',category:'reminder',body:'Hi [Client Name], this is American Trucking Compliance. Your DMV registration is coming up soon. Please call us at (951) 555-0000 so we can get started. Thank you!'},
+  {id:'sms2',name:'CARB Clean Truck Check Reminder',category:'reminder',body:'Hi [Client Name], your CARB Clean Truck Check is due soon. Avoid fines — contact American Trucking Compliance at (951) 555-0000 to schedule. Thank you!'},
+  {id:'sms3',name:'IRS Form 2290 Reminder',category:'reminder',body:'Hi [Client Name], your IRS Form 2290 (Heavy Vehicle Use Tax) filing is approaching. Contact us at (951) 555-0000 to get started. American Trucking Compliance.'},
+  {id:'sms4',name:'MCS-150 Biennial Update Reminder',category:'reminder',body:'Hi [Client Name], your MCS-150 biennial update is due. Failure to file may suspend your USDOT. Call us at (951) 555-0000. American Trucking Compliance.'},
+  {id:'sms5',name:'MC Permit Renewal Reminder',category:'reminder',body:'Hi [Client Name], your Motor Carrier Permit renewal is coming up. Contact American Trucking Compliance at (951) 555-0000 to renew. Thank you!'},
+  {id:'sms6',name:'Document Request',category:'documents',body:'Hi [Client Name], we need a few documents from you to move forward. Please upload them to your Google Drive folder or call us at (951) 555-0000. Thank you!'},
+  {id:'sms7',name:'Overdue — Action Required',category:'urgent',body:'URGENT: Hi [Client Name], you have a compliance item that is now OVERDUE. Please call American Trucking Compliance immediately at (951) 555-0000. Fines may apply.'},
+  {id:'sms8',name:'Service Complete',category:'general',body:'Hi [Client Name], great news! Your compliance filing has been completed. Please contact us at (951) 555-0000 if you have any questions. American Trucking Compliance.'},
+  {id:'sms9',name:'Payment Reminder',category:'general',body:'Hi [Client Name], this is a friendly reminder that your balance with American Trucking Compliance is due. Please call (951) 555-0000 to arrange payment. Thank you!'},
+  {id:'sms10',name:'Appointment Confirmation',category:'general',body:'Hi [Client Name], your appointment with American Trucking Compliance has been confirmed. Please call (951) 555-0000 if you need to reschedule. See you soon!'},
+  {id:'sms11',name:'Custom message',category:'custom',body:''}
+];
+
+function loadDB(){try{const d=localStorage.getItem(DB_KEY);return d?JSON.parse(d):null;}catch{return null;}}
+function saveDB(){try{localStorage.setItem(DB_KEY,JSON.stringify({users:S.users,clients:S.clients,trucks:S.trucks,activities:S.activities,reminders:S.reminders,docs:S.docs,docTemplates:S.docTemplates,smsTemplates:S.smsTemplates,apiConfig:S.apiConfig,session:S.user?{uid:S.user.id}:null}));}catch(e){console.error(e);}}
+function uid(){return Date.now().toString(36)+Math.random().toString(36).slice(2,8);}
+function dU(d){if(!d)return null;const dt=new Date(d),n=new Date();n.setHours(0,0,0,0);dt.setHours(0,0,0,0);return Math.round((dt-n)/86400000);}
+function fD(d){if(!d)return'—';const p=d.split('-');return`${p[1]}/${p[2]}/${p[0]}`;}
+function rD(days){const d=new Date();d.setDate(d.getDate()+days);return d.toISOString().split('T')[0];}
+function urgBadge(days){if(days===null)return'<span class="badge badge-gray">No date</span>';if(days<0)return`<span class="badge badge-danger">Overdue ${Math.abs(days)}d</span>`;if(days<=30)return`<span class="badge badge-danger">${days}d left</span>`;if(days<=60)return`<span class="badge badge-warning">${days}d left</span>`;if(days<=90)return`<span class="badge badge-info">${days}d left</span>`;return`<span class="badge badge-success">${days}d left</span>`;}
+function urgDot(days){if(days===null)return'#aaa';if(days<0||days<=30)return'#E24B4A';if(days<=60)return'#EF9F27';if(days<=90)return'#378ADD';return'#639922';}
+function docExt(name){const e=(name||'').split('.').pop().toLowerCase();if(e==='pdf')return['pdf','PDF'];if(['jpg','jpeg','png','gif','webp'].includes(e))return['img','IMG'];if(['doc','docx'].includes(e))return['doc','DOC'];if(['xls','xlsx','csv'].includes(e))return['xls','XLS'];return['other','FILE'];}
+function notify(msg,type='success'){const el=document.getElementById('notif');if(!el)return;el.textContent=msg;el.style.background=type==='error'?'#C62828':type==='warning'?'#B45309':'#2E7D32';el.style.color='#fff';el.classList.add('show');setTimeout(()=>el.classList.remove('show'),3200);}
+function fmtSize(bytes){if(bytes<1024)return bytes+'B';if(bytes<1048576)return Math.round(bytes/1024)+'KB';return Math.round(bytes/1048576*10)/10+'MB';}
+
+// Compute CARB dates from VIN/DMV month
+function carbDatesFromVin(vin,dmvExpMonth,isCA){
+  if(isCA&&dmvExpMonth){
+    const m=parseInt(dmvExpMonth);
+    const pair=CARB_CA[m];
+    if(pair)return pair;
+  }
+  if(!isCA&&vin){
+    const last=parseInt(vin[vin.length-1]);
+    const pair=CARB_NOCA[last];
+    if(pair)return pair;
+  }
+  return null;
+}
+
+// Build a year-specific date string from month name
+function monthToNextDate(mName){
+  const m=MONTH_NUM[mName];if(!m)return'';
+  const now=new Date();let y=now.getFullYear();
+  const target=new Date(y,m-1,28);
+  if(target<now)target.setFullYear(y+1);
+  return`${target.getFullYear()}-${String(m).padStart(2,'0')}-28`;
+}
+
+const DEF_USERS=[{id:'u1',name:'Admin User',email:'admin@atcompliance.com',password:'admin123',role:'admin'},{id:'u2',name:'Team Member',email:'team@atcompliance.com',password:'team123',role:'member'}];
+const DEF_CLIENTS=[
+  {id:'c1',name:'Jose Martinez',businessName:'Martinez Trucking LLC',phone:'(951) 555-0101',email:'jose@martineztrucking.com',address:'1234 Freight Ave, Riverside, CA 92501',dotNumber:'DOT-1234567',motorCarrierPermit:'MC-987654',mcs150:'2024-06-15',mcs150Due:'2026-06-30',mcPermitDue:'',notes:'Preferred contact: text message',services:['dmv','carb','irs2290'],gdriveUrl:'',isCARegistered:true,createdAt:'2024-01-15'},
+  {id:'c2',name:'Linda Chen',businessName:'Chen Express Inc',phone:'(909) 555-0202',email:'linda@chenexpress.com',address:'567 Highway Dr, Ontario, CA 91761',dotNumber:'DOT-2345678',motorCarrierPermit:'MC-876543',mcs150:'2024-09-20',mcs150Due:'2026-09-30',mcPermitDue:'',notes:'',services:['dmv','irs2290'],gdriveUrl:'',isCARegistered:true,createdAt:'2024-02-10'},
+  {id:'c3',name:'Robert Williams',businessName:'Williams Heavy Haul',phone:'(760) 555-0303',email:'rwilliams@heavyhaul.com',address:'890 Diesel Rd, Victorville, CA 92392',dotNumber:'DOT-3456789',motorCarrierPermit:'MC-765432',mcs150:'2025-01-10',mcs150Due:'2027-01-31',mcPermitDue:'',notes:'Two trucks',services:['carb','irs2290'],gdriveUrl:'',isCARegistered:false,createdAt:'2024-03-05'}
+];
+const DEF_TRUCKS=[
+  {id:'t1',clientId:'c1',vin:'1XKWDB0X57J211825',plate:'CA-7T12345',year:'2019',make:'Kenworth',model:'T680',weight:'80000',dmvExp:rD(22),carbDue1:rD(22),carbDue2:rD(200),irs2290Due:'2025-08-31',mcPermitDue:'',mcs150Due:'',dmvPaid:false,carbPaid:true,irsPaid:false,carbCompliant:true,dmvCompliant:false,irsCompliant:false},
+  {id:'t2',clientId:'c2',vin:'3HSCUAPR7CN134682',plate:'CA-8C98765',year:'2020',make:'Freightliner',model:'Cascadia',weight:'80000',dmvExp:rD(75),carbDue1:rD(12),carbDue2:rD(190),irs2290Due:'2025-08-31',mcPermitDue:'',mcs150Due:'',dmvPaid:true,carbPaid:false,irsPaid:true,carbCompliant:false,dmvCompliant:true,irsCompliant:true},
+  {id:'t3',clientId:'c3',vin:'4V4NC9EH7AN311563',plate:'CA-4R55443',year:'2018',make:'Volvo',model:'VNL 860',weight:'80000',dmvExp:rD(-4),carbDue1:rD(85),carbDue2:rD(270),irs2290Due:'2025-08-31',mcPermitDue:'',mcs150Due:'',dmvPaid:false,carbPaid:false,irsPaid:false,carbCompliant:false,dmvCompliant:false,irsCompliant:false},
+  {id:'t4',clientId:'c3',vin:'1FUJGEDV5CLBN3211',plate:'CA-6P77821',year:'2021',make:'Peterbilt',model:'579',weight:'80000',dmvExp:rD(52),carbDue1:rD(-8),carbDue2:rD(180),irs2290Due:'2025-08-31',mcPermitDue:'',mcs150Due:'',dmvPaid:true,carbPaid:false,irsPaid:false,carbCompliant:false,dmvCompliant:true,irsCompliant:false}
+];
+const DEF_ACTS=[
+  {id:'a1',clientId:'c1',userId:'u1',type:'call',note:'Called regarding DMV renewal. Client confirmed address is current.',createdAt:new Date(Date.now()-345600000).toISOString()},
+  {id:'a2',clientId:'c2',userId:'u2',type:'email',note:'Sent CARB clean truck check reminder. Client acknowledged.',createdAt:new Date(Date.now()-691200000).toISOString()}
+];
+
+const DEF_TEMPLATES=[
+  {id:'tmpl1',name:'DMV Renewal — Required Documents',service:'dmv_renewal',items:[...DOC_CHECKLISTS.dmv_renewal.items],emailSubject:'Documents Needed — DMV Registration Renewal',emailBody:'Dear [Client Name],\n\nThank you for choosing American Trucking Compliance. To complete your DMV registration renewal, please upload the following documents to your client portal or the Google Drive link below:\n\n[DOCUMENT LIST]\n\nPlease upload your documents here: [GOOGLE DRIVE LINK]\n\nIf you have any questions, please call us at (951) 555-0000.\n\nThank you,\nAmerican Trucking Compliance'},
+  {id:'tmpl2',name:'IRS Form 2290 — Required Documents',service:'irs2290',items:[...DOC_CHECKLISTS.irs2290.items],emailSubject:'Documents Needed — IRS Form 2290 Heavy Vehicle Use Tax',emailBody:'Dear [Client Name],\n\nTo prepare and file your IRS Form 2290 (Heavy Vehicle Use Tax), please provide the following information:\n\n[DOCUMENT LIST]\n\nPlease upload your documents here: [GOOGLE DRIVE LINK]\n\nThe annual Form 2290 filing deadline is August 31st. Please respond promptly.\n\nThank you,\nAmerican Trucking Compliance'},
+  {id:'tmpl3',name:'CARB Clean Truck Check — Required Items',service:'carb',items:[...DOC_CHECKLISTS.carb.items],emailSubject:'Action Required — CARB Clean Truck Check Compliance',emailBody:'Dear [Client Name],\n\nYour vehicle is due for its CARB Clean Truck Check compliance testing. Please gather the following items:\n\n[DOCUMENT LIST]\n\nPlease upload your documents here: [GOOGLE DRIVE LINK]\n\nNon-compliance may result in fines. Please contact us to schedule your testing.\n\nThank you,\nAmerican Trucking Compliance'},
+  {id:'tmpl4',name:'MCS-150 Biennial Update — Required Items',service:'mcs150',items:[...DOC_CHECKLISTS.mcs150.items],emailSubject:'Action Required — MCS-150 Biennial Update Due',emailBody:'Dear [Client Name],\n\nYour MCS-150 Biennial Update is due. Please provide the following information:\n\n[DOCUMENT LIST]\n\nPlease respond or upload your documents here: [GOOGLE DRIVE LINK]\n\nFiling must be completed to maintain active USDOT operating authority.\n\nThank you,\nAmerican Trucking Compliance'}
+];
+
+function init(){
+  const db=loadDB();
+  S.users=db?.users||DEF_USERS;
+  S.clients=db?.clients||DEF_CLIENTS;
+  S.trucks=db?.trucks||DEF_TRUCKS;
+  S.activities=db?.activities||DEF_ACTS;
+  S.reminders=db?.reminders||[];
+  S.docs=db?.docs||[];
+  S.docTemplates=db?.docTemplates||DEF_TEMPLATES;
+  S.smsTemplates=db?.smsTemplates||DEF_SMS_TEMPLATES;
+  S.apiConfig=db?.apiConfig||DEF_API_CONFIG;
+  if(db?.session){const u=S.users.find(x=>x.id===db.session.uid);if(u){S.user=u;S.view='dashboard';}}
+  render();
+}
+
+function render(){
+  const root=document.getElementById('app-root');if(!root)return;
+  if(!S.user){root.innerHTML=rLogin();bindLogin();return;}
+  root.innerHTML=`<div id="app">${rSidebar()}<div class="main">${rContent()}</div></div>${S.modal?rModal():''}`;
+  bindAll();
+}
+
+function rLogin(){
+  return`<div class="login-wrap"><div class="login-card"><div style="text-align:center;margin-bottom:20px"><div style="width:70px;height:70px;background:var(--blue);border-radius:14px;display:inline-flex;align-items:center;justify-content:center;margin-bottom:10px"><svg width="36" height="36" fill="none" stroke="#fff" stroke-width="2" viewBox="0 0 24 24"><rect x="1" y="3" width="15" height="13" rx="2"/><path d="M16 8l5 3-5 3V8z"/></svg></div><h2 style="font-size:18px;font-weight:700;color:var(--text-primary)">American Trucking Compliance</h2><p style="font-size:12px;color:var(--text-muted);margin-top:4px">Client Management System</p></div><div class="form-group"><label class="form-label">Email address</label><input class="form-input" id="l-email" type="email" placeholder="your@email.com" autocomplete="username"></div><div class="form-group"><label class="form-label">Password</label><input class="form-input" id="l-pass" type="password" placeholder="Password" autocomplete="current-password"></div><div id="l-err" style="color:var(--red);font-size:11px;margin-bottom:8px;display:none;padding:6px 10px;background:var(--red-light);border-radius:6px">Incorrect email or password.</div><button class="btn btn-primary" style="width:100%;padding:10px;font-size:14px" id="l-btn">Sign in</button><div style="margin-top:16px;padding-top:12px;border-top:1px solid var(--card-border);font-size:11px;color:var(--text-muted)"><strong>Default:</strong> admin@atcompliance.com / admin123</div></div></div>`;
+}
+function bindLogin(){
+  document.getElementById('l-btn')?.addEventListener('click',doLogin);
+  document.getElementById('l-pass')?.addEventListener('keydown',e=>{if(e.key==='Enter')doLogin();});
+}
+function doLogin(){
+  const e=document.getElementById('l-email').value.trim().toLowerCase(),p=document.getElementById('l-pass').value;
+  const u=S.users.find(x=>x.email.toLowerCase()===e&&x.password===p);
+  if(u){S.user=u;S.view='dashboard';saveDB();render();}
+  else document.getElementById('l-err').style.display='block';
+}
+
+const ICO={
+  grid:`<svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>`,
+  users:`<svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg>`,
+  bell:`<svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>`,
+  folder:`<svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>`,
+  list:`<svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>`,
+  cog:`<svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>`
+};
+
+function rSidebar(){
+  const pend=S.reminders.filter(r=>r.status==='pending').length;
+  const navs=[
+    {sec:'Main'},{id:'dashboard',label:'Dashboard',icon:'grid'},
+    {id:'clients',label:'Clients',icon:'users',badge:S.clients.length,bBlue:true},
+    {sec:'Tools'},
+    {id:'documents',label:'Documents',icon:'folder',badge:S.docs.length||null,bBlue:true},
+    {id:'checklists',label:'Doc Checklists',icon:'list'},
+    {id:'reminders',label:'Reminders',icon:'bell',badge:pend||null},
+    {sec:'System'},{id:'settings',label:'Settings',icon:'cog'}
+  ];
+  return`<div class="sidebar"><div class="sb-logo"><div class="sb-logo-placeholder"><svg width="36" height="36" fill="none" stroke="#fff" stroke-width="1.5" viewBox="0 0 24 24"><rect x="1" y="3" width="15" height="13" rx="2"/><path d="M16 8l5 3-5 3V8z"/></svg></div><h1>American Trucking Compliance</h1><p>Client Management System</p></div><div class="sb-nav">${navs.map(n=>{if(n.sec)return`<div class="sb-section">${n.sec}</div>`;const isA=S.view===n.id||(S.view==='client-detail'&&n.id==='clients');const bHtml=n.badge?`<span class="nav-badge ${n.bBlue?'nav-badge-blue':''}">${n.badge}</span>`:'';return`<div class="nav-item ${isA?'active':''}" data-nav="${n.id}">${ICO[n.icon]}<span>${n.label}</span>${bHtml}</div>`;}).join('')}</div><div class="sb-user"><div class="sb-user-name">${S.user.name}</div><div class="sb-user-role">${S.user.role==='admin'?'Administrator':'Team Member'}</div><button class="sb-signout" id="signout-btn">Sign out</button></div></div>`;
+}
+
+function rContent(){
+  if(S.view==='dashboard')return rDash();
+  if(S.view==='clients')return rClients();
+  if(S.view==='client-detail')return rDetail();
+  if(S.view==='documents')return rDocsPage();
+  if(S.view==='checklists')return rChecklists();
+  if(S.view==='reminders')return rReminders();
+  if(S.view==='settings')return rSettings();
+  return rDash();
+}
+
+function rDash(){
+  const items=[];
+  S.trucks.forEach(t=>{
+    const c=S.clients.find(x=>x.id===t.clientId);if(!c)return;
+    const checks=[
+      {svc:'dmv',date:t.dmvExp,label:'DMV Registration'},{svc:'carb',date:t.carbDue1,label:'Clean Truck Check (1)'},
+      {svc:'carb',date:t.carbDue2,label:'Clean Truck Check (2)'},{svc:'irs2290',date:t.irs2290Due,label:'IRS Form 2290'},
+      {svc:'mcs150',date:t.mcs150Due||c.mcs150Due,label:'MCS-150'},{svc:'mc_permit',date:t.mcPermitDue||c.mcPermitDue,label:'MC Permit'}
+    ];
+    checks.forEach(ch=>{if(c.services.includes(ch.svc)&&ch.date){const days=dU(ch.date);if(days!==null)items.push({...ch,days,clientId:c.id,clientName:c.businessName,plate:t.plate});}});
+  });
+  items.sort((a,b)=>a.days-b.days);
+  const ov=items.filter(x=>x.days<0).length,d30=items.filter(x=>x.days>=0&&x.days<=30).length,d60=items.filter(x=>x.days>30&&x.days<=60).length,d90=items.filter(x=>x.days>60&&x.days<=90).length;
+  const urgent=items.filter(x=>x.days<=90);
+  const acts=[...S.activities].sort((a,b)=>new Date(b.createdAt)-new Date(a.createdAt)).slice(0,5);
+  const aIco={call:'📞',email:'📧',note:'📝',sms:'💬'};
+  const aClr={call:'#DBEAFE',email:'#D1FAE5',note:'#EDE9FE',sms:'#FEF3C7'};
+  const unlinked=S.trucks.filter(t=>!t.clientId||!S.clients.find(c=>c.id===t.clientId));
+  return`<div class="page-header"><div><h2>Dashboard</h2><div class="page-header-sub">${new Date().toLocaleDateString('en-US',{weekday:'long',year:'numeric',month:'long',day:'numeric'})}</div></div></div><div class="page-body">${unlinked.length>0?`<div class="unlinked-warning">⚠️ ${unlinked.length} truck(s) have no linked client. <button class="btn btn-sm btn-amber" style="margin-left:8px" data-action="view-unlinked">Review unlinked trucks</button></div>`:''}<div class="metric-grid"><div class="metric success"><div class="metric-label">Total Clients</div><div class="metric-value">${S.clients.length}</div></div><div class="metric danger"><div class="metric-label">Overdue</div><div class="metric-value">${ov}</div></div><div class="metric warning"><div class="metric-label">Due ≤ 30 days</div><div class="metric-value">${d30}</div></div><div class="metric info"><div class="metric-label">Due 60–90 days</div><div class="metric-value">${d60+d90}</div></div></div><div style="display:grid;grid-template-columns:3fr 2fr;gap:14px"><div><div class="card"><div class="card-header"><h3>Upcoming &amp; overdue items</h3><span style="font-size:11px;color:var(--text-muted)">${urgent.length} within 90 days</span></div><div class="card-body" style="max-height:320px;overflow-y:auto;padding:10px">${urgent.length===0?'<p style="color:var(--text-muted)">All items are current — great work!</p>':urgent.map(item=>`<div class="alert-row" data-client="${item.clientId}"><div class="alert-dot" style="background:${urgDot(item.days)}"></div><div style="flex:1;min-width:0"><div style="font-size:12px;font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${item.clientName}</div><div style="font-size:11px;color:var(--text-muted)">${item.label} · ${item.plate} · Due ${fD(item.date)}</div></div>${urgBadge(item.days)}</div>`).join('')}</div></div></div><div><div class="card"><div class="card-header"><h3>Recent activity</h3></div><div class="card-body">${acts.length===0?'<p style="color:var(--text-muted)">No activity yet.</p>':acts.map(a=>{const c=S.clients.find(x=>x.id===a.clientId);const u=S.users.find(x=>x.id===a.userId);return`<div class="activity-item"><div class="activity-icon" style="background:${aClr[a.type]||'#EDE9FE'}">${aIco[a.type]||'📝'}</div><div style="flex:1;min-width:0"><div style="font-size:11px;font-weight:700">${c?.businessName||'Unknown'}</div><div style="font-size:11px;color:var(--text-secondary);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${a.note}</div><div style="font-size:10px;color:var(--text-muted);margin-top:2px">${u?.name||'?'} · ${new Date(a.createdAt).toLocaleDateString()}</div></div></div>`;}).join('')}</div></div><div class="card"><div class="card-header"><h3>Quick links</h3></div><div class="card-body" style="display:flex;flex-direction:column;gap:5px"><a href="https://cleantruckcheck.arb.ca.gov/Fleet/Vehicle/VehicleComplianceStatusLookup" target="_blank" class="btn btn-sm" style="text-decoration:none;text-align:left">CARB Clean Truck Check</a><a href="https://www.dmv.ca.gov/portal/vehicle-registration/registration-fees/vehicle-registration-fee-calculator/calculate-my-fees/" target="_blank" class="btn btn-sm" style="text-decoration:none;text-align:left">CA DMV Registration Fees</a><a href="https://account.tax2efile.com/Account/Login/?form=Tax2efile#!" target="_blank" class="btn btn-sm" style="text-decoration:none;text-align:left">IRS Form 2290 Portal</a><a href="https://safer.fmcsa.dot.gov/CompanySnapshot.aspx" target="_blank" class="btn btn-sm" style="text-decoration:none;text-align:left">FMCSA Carrier Lookup</a><a href="https://www.dmv.ca.gov/portal/dmv-virtual-office/motor-carrier-permit-online-renewal/mcp-application/" target="_blank" class="btn btn-sm" style="text-decoration:none;text-align:left">MC Permit Application</a><a href="https://www.dmv.ca.gov/portal/handbook/vehicle-industry-registration-procedures-manual-2/introduction/" target="_blank" class="btn btn-sm" style="text-decoration:none;text-align:left">DMV Vehicle Manual</a></div></div></div></div></div>`;
+}
+
+function rClients(){
+  const q=S.filter.toLowerCase();
+  const filtered=S.clients.filter(c=>!q||c.name.toLowerCase().includes(q)||c.businessName.toLowerCase().includes(q)||(c.dotNumber||'').toLowerCase().includes(q)||(c.phone||'').includes(q));
+  return`<div class="page-header"><div><h2>Clients <span style="font-weight:400;font-size:13px;opacity:0.8">(${S.clients.length})</span></h2><div class="page-header-sub">All commercial truck owners</div></div><div style="display:flex;gap:6px"><button class="btn btn-sm" style="background:rgba(255,255,255,0.15);border-color:rgba(255,255,255,0.3);color:#fff" data-action="view-unlinked">Unlinked trucks</button><button class="btn btn-success btn-sm" id="add-client-btn">+ Add client</button></div></div><div class="page-body"><div style="margin-bottom:12px"><input class="form-input" id="client-search" placeholder="Search by name, business, DOT number, phone..." value="${S.filter}" style="max-width:420px"></div><div class="card" style="overflow-x:auto"><table class="table"><thead><tr><th style="width:26%">Client / Business</th><th style="width:15%">Phone</th><th style="width:14%">DOT number</th><th style="width:24%">Services</th><th style="width:6%">Trucks</th><th style="width:9%">Status</th><th style="width:6%"></th></tr></thead><tbody>${filtered.length===0?'<tr><td colspan="7" style="text-align:center;padding:2rem;color:var(--text-muted)">No clients found</td></tr>':filtered.map(c=>{const trucks=S.trucks.filter(t=>t.clientId===c.id);const days=trucks.flatMap(t=>[dU(t.dmvExp),dU(t.carbDue1),dU(t.carbDue2),dU(t.irs2290Due),dU(t.mcs150Due||c.mcs150Due),dU(t.mcPermitDue||c.mcPermitDue)]).filter(x=>x!==null);const mn=days.length?Math.min(...days):null;let sb='<span class="badge badge-success">Current</span>';if(mn!==null){if(mn<0)sb='<span class="badge badge-danger">Overdue</span>';else if(mn<=30)sb='<span class="badge badge-danger">Due soon</span>';else if(mn<=60)sb='<span class="badge badge-warning">Upcoming</span>';else if(mn<=90)sb='<span class="badge badge-info">Scheduled</span>';}const ini=(c.businessName||'??').split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();return`<tr><td style="cursor:pointer" data-action="view" data-id="${c.id}"><div style="display:flex;align-items:center;gap:8px"><div style="width:28px;height:28px;border-radius:50%;background:#DBEAFE;color:#1e40af;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;flex-shrink:0">${ini}</div><div><div style="font-weight:700;font-size:12px">${c.businessName}</div><div style="font-size:10px;color:var(--text-muted)">${c.name}</div></div></div></td><td>${c.phone||'—'}</td><td style="font-size:11px;color:var(--text-muted)">${c.dotNumber||'—'}</td><td>${c.services.slice(0,4).map(s=>`<span class="chip ${SVC_CHIP[s]||'badge-gray'}">${s==='dmv'?'DMV':s==='carb'?'CARB':s==='irs2290'?'IRS':s==='mcs150'?'MCS':s==='mc_permit'?'MC':s==='epn'?'EPN':s==='vin_verify'?'VIN':'ACM'}</span>`).join('')}${c.services.length>4?`<span class="chip badge-gray">+${c.services.length-4}</span>`:''}</td><td style="text-align:center;font-weight:700">${trucks.length}</td><td>${sb}</td><td><button class="btn btn-sm btn-danger" data-action="del-client" data-id="${c.id}" title="Delete client">✕</button></td></tr>`;}).join('')}</tbody></table></div></div>`;
+}
+
+function rDetail(){
+  const c=S.clients.find(x=>x.id===S.selectedClient);if(!c)return rClients();
+  const cTrucks=S.trucks.filter(t=>t.clientId===c.id);
+  const cActs=S.activities.filter(a=>a.clientId===c.id).sort((a,b)=>new Date(b.createdAt)-new Date(a.createdAt));
+  const cDocs=S.docs.filter(d=>d.clientId===c.id);
+  const TABS=['Overview','Trucks & Compliance','Activity log','Documents','Reminders','Checklists'];
+  const ini=(c.businessName||'??').split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
+  return`<div class="page-header"><div style="display:flex;align-items:center;gap:10px"><button class="btn btn-sm" id="back-btn" style="background:rgba(255,255,255,0.15);border-color:rgba(255,255,255,0.3);color:#fff">← Back</button><div style="width:32px;height:32px;border-radius:50%;background:rgba(255,255,255,0.2);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#fff">${ini}</div><div><h2>${c.businessName}</h2><div class="page-header-sub">${c.name} · ${c.dotNumber||'No DOT'}</div></div></div><div style="display:flex;gap:6px;flex-wrap:wrap"><button class="btn btn-sm" style="background:rgba(255,255,255,0.15);border-color:rgba(255,255,255,0.3);color:#fff" data-action="edit-client" data-id="${c.id}">Edit</button><button class="btn btn-sm" style="background:#25D366;border-color:#1ebe57;color:#fff;font-weight:700" data-action="send-text" data-cid="${c.id}">💬 Send Text</button><button class="btn btn-success btn-sm" data-action="add-truck" data-cid="${c.id}">+ Add truck</button><button class="btn btn-sm btn-danger-solid" data-action="del-client" data-id="${c.id}">Delete client</button></div></div><div class="page-body"><div class="tab-bar">${TABS.map((t,i)=>`<div class="tab ${i===S.tab?'active':''}" data-tab="${i}">${t}${i===1?` (${cTrucks.length})`:i===3?` (${cDocs.length})`:''}</div>`).join('')}</div>${S.tab===0?rOverview(c):S.tab===1?rTrucks(c,cTrucks):S.tab===2?rActLog(c,cActs):S.tab===3?rClientDocs(c,cDocs):S.tab===4?rCRems(c):rClientChecklist(c)}</div>`;
+}
+
+function rOverview(c){
+  return`<div style="display:grid;grid-template-columns:1fr 1fr;gap:14px"><div class="card"><div class="card-header"><h3>Contact information</h3></div><div class="card-body"><table style="width:100%;font-size:12px"><tr><td style="color:var(--text-muted);padding:5px 0;width:120px">Owner</td><td style="font-weight:600">${c.name||'—'}</td></tr><tr><td style="color:var(--text-muted);padding:5px 0">Phone</td><td><a href="tel:${c.phone}" style="color:var(--blue);font-weight:600">${c.phone||'—'}</a></td></tr><tr><td style="color:var(--text-muted);padding:5px 0">Email</td><td><a href="mailto:${c.email}" style="color:var(--blue)">${c.email||'—'}</a></td></tr><tr><td style="color:var(--text-muted);padding:5px 0">Address</td><td>${c.address||'—'}</td></tr></table></div></div><div class="card"><div class="card-header"><h3>Regulatory info</h3></div><div class="card-body"><table style="width:100%;font-size:12px"><tr><td style="color:var(--text-muted);padding:5px 0;width:120px">USDOT</td><td style="font-weight:600">${c.dotNumber||'—'}</td></tr><tr><td style="color:var(--text-muted);padding:5px 0">MC Permit</td><td>${c.motorCarrierPermit||'—'}</td></tr><tr><td style="color:var(--text-muted);padding:5px 0">MC Permit Due</td><td>${c.mcPermitDue?fD(c.mcPermitDue):'—'}</td></tr><tr><td style="color:var(--text-muted);padding:5px 0">MCS-150 filed</td><td>${fD(c.mcs150)}</td></tr><tr><td style="color:var(--text-muted);padding:5px 0">MCS-150 due</td><td>${c.mcs150Due?fD(c.mcs150Due):'—'} <span style="font-size:10px;color:var(--text-muted)">(every 2 yrs)</span></td></tr><tr><td style="color:var(--text-muted);padding:5px 0">Registration</td><td><span class="badge ${c.isCARegistered?'badge-info':'badge-gray'}">${c.isCARegistered?'CA Registered':'Non-CA / DMV Exempt'}</span></td></tr><tr><td style="color:var(--text-muted);padding:5px 0">Services</td><td>${c.services.map(s=>`<span class="chip ${SVC_CHIP[s]||''}">${SL[s]||s}</span>`).join(' ')||'None'}</td></tr></table></div></div>${c.notes?`<div class="card" style="grid-column:1/-1"><div class="card-header"><h3>Notes</h3></div><div class="card-body"><p style="font-size:12px;color:var(--text-secondary)">${c.notes}</p></div></div>`:''}</div><div style="margin-top:12px;display:flex;gap:6px;flex-wrap:wrap"><a href="https://cleantruckcheck.arb.ca.gov/Fleet/Vehicle/VehicleComplianceStatusLookup" target="_blank" class="btn btn-sm" style="text-decoration:none">CARB lookup</a><a href="https://www.dmv.ca.gov/portal/vehicle-registration/registration-fees/vehicle-registration-fee-calculator/calculate-my-fees/" target="_blank" class="btn btn-sm" style="text-decoration:none">DMV fees</a><a href="https://account.tax2efile.com/Account/Login/?form=Tax2efile#!" target="_blank" class="btn btn-sm" style="text-decoration:none">IRS 2290 portal</a><a href="https://safer.fmcsa.dot.gov/CompanySnapshot.aspx" target="_blank" class="btn btn-sm" style="text-decoration:none">FMCSA lookup</a>${c.gdriveUrl?`<a href="${c.gdriveUrl}" target="_blank" class="btn btn-sm" style="text-decoration:none;background:var(--green-light);border-color:#A5D6A7;color:var(--green)">Open Google Drive</a>`:''}</div>`;
+}
+
+function rTrucks(c,trucks){
+  if(!trucks.length)return`<div class="card"><div class="card-body"><p style="color:var(--text-muted)">No trucks added. Click "+ Add truck" above.</p></div></div>`;
+  return trucks.map(t=>{
+    const dd=dU(t.dmvExp),cd1=dU(t.carbDue1),cd2=dU(t.carbDue2),id=dU(t.irs2290Due);
+    const mc=dU(t.mcPermitDue||c.mcPermitDue),ms=dU(t.mcs150Due||c.mcs150Due);
+    function compBadge(compliant,days){if(compliant)return'<span class="badge-compliant badge" style="margin-left:4px">Compliant</span>';if(days!==null&&days<0)return'<span class="badge-noncompliant badge" style="margin-left:4px">Non-Compliant</span>';return'';}
+    return`<div class="card"><div class="card-header"><div><span style="font-weight:700">${t.year} ${t.make} ${t.model}</span><span style="font-size:11px;color:var(--text-muted);margin-left:10px">Plate: ${t.plate}</span></div><div style="display:flex;gap:5px"><button class="btn btn-sm" data-action="link-truck" data-id="${t.id}" title="Link/reassign truck">🔗 Link</button><button class="btn btn-sm" data-action="edit-truck" data-id="${t.id}">Edit</button></div></div><div class="card-body"><div style="font-size:11px;color:var(--text-muted);margin-bottom:12px">VIN: ${t.vin} &nbsp;·&nbsp; GVW: ${parseInt(t.weight||0).toLocaleString()} lbs</div><div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px">${c.services.includes('dmv')?`<div class="due-block"><div class="due-block-title">DMV Registration</div><div class="due-block-date">${fD(t.dmvExp)}</div><div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:3px">${urgBadge(dd)}${compBadge(t.dmvCompliant,dd)}<span class="paid-pill ${t.dmvPaid?'paid':'unpaid'}" data-action="toggle-paid" data-truck="${t.id}" data-field="dmvPaid">${t.dmvPaid?'Paid':'Unpaid'}</span></div></div>`:''} ${c.services.includes('carb')?`<div class="due-block"><div class="due-block-title">Clean Truck Check #1</div><div class="due-block-date">${fD(t.carbDue1)}</div><div style="display:flex;align-items:center;flex-wrap:wrap;gap:3px">${urgBadge(cd1)}${compBadge(t.carbCompliant,cd1)}<span class="paid-pill ${t.carbPaid?'paid':'unpaid'}" data-action="toggle-paid" data-truck="${t.id}" data-field="carbPaid">${t.carbPaid?'Paid':'Unpaid'}</span></div></div>`:''} ${c.services.includes('carb')?`<div class="due-block"><div class="due-block-title">Clean Truck Check #2</div><div class="due-block-date">${fD(t.carbDue2)}</div><div style="display:flex;align-items:center;flex-wrap:wrap;gap:3px">${urgBadge(cd2)}</div></div>`:''} ${c.services.includes('irs2290')?`<div class="due-block"><div class="due-block-title">IRS Form 2290</div><div class="due-block-date">${fD(t.irs2290Due)}</div><div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:3px">${urgBadge(id)}${compBadge(t.irsCompliant,id)}<span class="paid-pill ${t.irsPaid?'paid':'unpaid'}" data-action="toggle-paid" data-truck="${t.id}" data-field="irsPaid">${t.irsPaid?'Paid':'Unpaid'}</span></div></div>`:''} ${c.services.includes('mcs150')?`<div class="due-block"><div class="due-block-title">MCS-150</div><div class="due-block-date">${fD(t.mcs150Due||c.mcs150Due)}</div><div>${urgBadge(ms)}</div></div>`:''} ${c.services.includes('mc_permit')?`<div class="due-block"><div class="due-block-title">MC Permit</div><div class="due-block-date">${fD(t.mcPermitDue||c.mcPermitDue)}</div><div>${urgBadge(mc)}</div></div>`:''}</div><div style="margin-top:8px;display:flex;gap:5px;flex-wrap:wrap"><button class="btn btn-sm" onclick="window.open('https://cleantruckcheck.arb.ca.gov/Fleet/Vehicle/VehicleComplianceStatusLookup','_blank')">CARB lookup</button><button class="btn btn-sm" onclick="window.open('https://www.dmv.ca.gov/portal/vehicle-registration/registration-fees/vehicle-registration-fee-calculator/calculate-my-fees/','_blank')">DMV fees</button><button class="btn btn-sm" data-action="toggle-compliant" data-truck="${t.id}" data-field="dmvCompliant">Mark DMV ${t.dmvCompliant?'Non-Compliant':'Compliant'}</button><button class="btn btn-sm" data-action="toggle-compliant" data-truck="${t.id}" data-field="carbCompliant">Mark CARB ${t.carbCompliant?'Non-Compliant':'Compliant'}</button></div></div></div>`;
+  }).join('');
+}
+
+function rActLog(c,acts){
+  const tL={call:'Phone call',email:'Email',note:'Note',sms:'SMS'};
+  return`<div><div style="margin-bottom:10px"><button class="btn btn-primary btn-sm" data-action="add-activity" data-cid="${c.id}">+ Log activity</button></div>${acts.length===0?`<div class="card"><div class="card-body"><p style="color:var(--text-muted)">No activity logged yet.</p></div></div>`:acts.map(a=>{const u=S.users.find(x=>x.id===a.userId);return`<div class="card"><div class="card-body" style="padding:9px 14px"><div style="display:flex;align-items:center;gap:6px;margin-bottom:5px"><span class="badge badge-info">${tL[a.type]||a.type}</span><span style="font-size:11px;color:var(--text-muted)">${new Date(a.createdAt).toLocaleString()} · ${u?.name||'?'}</span></div><p style="font-size:12px">${a.note}</p></div></div>`;}).join('')}</div>`;
+}
+
+function rClientDocs(c,docs){
+  return`<div><div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;flex-wrap:wrap;gap:6px"><div style="display:flex;gap:5px;flex-wrap:wrap"><button class="btn btn-primary btn-sm" id="upload-doc-btn" data-cid="${c.id}">+ Upload document</button>${c.gdriveUrl?`<a href="${c.gdriveUrl}" target="_blank" class="btn btn-sm" style="text-decoration:none;background:var(--green-light);color:var(--green);border-color:#A5D6A7">Open Drive folder</a>`:''}</div><button class="btn btn-sm" data-action="set-gdrive" data-id="${c.id}">Set Drive folder URL</button></div>${!c.gdriveUrl?`<div class="unlinked-warning">No Google Drive folder linked. Click "Set Drive folder URL" to enable auto-sync.</div>`:''}<div class="doc-drop" id="drop-zone-${c.id}" data-cid="${c.id}"><div style="font-size:13px;font-weight:700;color:var(--text-secondary);margin-bottom:4px">Drag &amp; drop files here</div><div style="font-size:11px;color:var(--text-muted)">or click Upload document above</div></div>${docs.length>0?`<div style="margin-top:12px">${docs.map(d=>{const[extClass,extLabel]=docExt(d.name);const synced=d.synced&&c.gdriveUrl;return`<div class="doc-item"><div class="doc-icon doc-icon-${extClass}">${extLabel}</div><div style="flex:1;min-width:0"><div style="font-size:12px;font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${d.name}</div><div style="font-size:10px;color:var(--text-muted)">${d.size||'—'} · ${new Date(d.uploadedAt).toLocaleDateString()} · ${S.users.find(u=>u.id===d.userId)?.name||'?'}</div></div><span class="${synced?'gdrive-badge':'gdrive-badge gdrive-pending'}">${synced?'Synced':'Pending sync'}</span><button class="btn btn-sm" data-action="preview-doc" data-id="${d.id}" data-name="${d.name}" data-type="${extClass}" data-url="${d.dataUrl||''}">Preview</button><button class="btn btn-sm btn-danger" data-action="del-doc" data-id="${d.id}">Remove</button></div>`;}).join('')}</div>`:`<p style="font-size:12px;color:var(--text-muted);margin-top:12px">No documents uploaded yet.</p>`}</div>`;
+}
+
+function rCRems(c){
+  const cRems=S.reminders.filter(r=>r.clientId===c.id).sort((a,b)=>new Date(b.createdAt)-new Date(a.createdAt));
+  return`<div><div style="margin-bottom:10px;display:flex;gap:5px"><button class="btn btn-primary btn-sm" data-action="create-reminder" data-cid="${c.id}">+ Create reminder</button></div>${cRems.length===0?`<div class="card"><div class="card-body"><p style="color:var(--text-muted)">No reminders yet.</p></div></div>`:cRems.map(r=>{const sb=r.status==='pending'?'badge-warning':'badge-success';return`<div class="card"><div class="card-header"><div style="display:flex;gap:5px;align-items:center;flex-wrap:wrap"><span class="badge ${sb}">${r.status}</span><span class="badge badge-gray">${(r.channel||'email').toUpperCase()}</span><span class="badge badge-purple">${r.serviceLabel||''}</span></div><span style="font-size:11px;color:var(--text-muted)">${new Date(r.createdAt).toLocaleDateString()}</span></div><div class="card-body"><pre style="font-size:12px;font-family:inherit;white-space:pre-wrap;background:#F0F6FF;padding:10px;border-radius:var(--radius);border:1.5px solid var(--card-border)">${r.message}</pre>${r.status==='pending'?`<div style="margin-top:7px;display:flex;gap:5px"><button class="btn btn-success btn-sm" data-action="approve-rem" data-id="${r.id}">Approve &amp; send</button><button class="btn btn-sm" data-action="edit-rem" data-id="${r.id}">Edit</button></div>`:''}</div></div>`;}).join('')}</div>`;
+}
+
+function rClientChecklist(c){
+  const relevant=S.docTemplates.filter(t=>{
+    if(c.services.includes('dmv')&&(t.service.startsWith('dmv')||t.service==='dmv_renewal'||t.service==='dmv_new'||t.service==='dmv_title'||t.service==='dmv_vin'||t.service==='dmv_mcp'||t.service==='dmv_epn'))return true;
+    if(c.services.includes('irs2290')&&t.service==='irs2290')return true;
+    if(c.services.includes('carb')&&t.service==='carb')return true;
+    if(c.services.includes('mcs150')&&t.service==='mcs150')return true;
+    return false;
+  });
+  return`<div><div style="margin-bottom:10px;display:flex;gap:6px;flex-wrap:wrap"><button class="btn btn-primary btn-sm" data-action="send-checklist" data-cid="${c.id}">Send document checklist by email</button></div>${relevant.length===0?`<div class="card"><div class="card-body"><p style="color:var(--text-muted)">No checklists match this client's enrolled services. Add services in Edit client.</p></div></div>`:relevant.map(tmpl=>`<div class="card"><div class="card-header"><h3>${tmpl.name}</h3></div><div class="card-body">${tmpl.items.map((item,i)=>`<div class="checklist-item"><input type="checkbox" id="chk-${tmpl.id}-${i}"><label for="chk-${tmpl.id}-${i}">${item}</label></div>`).join('')}</div></div>`).join('')}</div>`;
+}
+
+function rDocsPage(){
+  const total=S.docs.length;
+  const synced=S.docs.filter(d=>{const c=S.clients.find(x=>x.id===d.clientId);return d.synced&&c?.gdriveUrl;}).length;
+  return`<div class="page-header"><div><h2>Documents</h2><div class="page-header-sub">All client documents</div></div></div><div class="page-body"><div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:14px"><div class="metric success" style="border-top-width:4px"><div class="metric-label">Total docs</div><div class="metric-value" style="font-size:22px">${total}</div></div><div class="metric info" style="border-top-width:4px"><div class="metric-label">Synced to Drive</div><div class="metric-value" style="font-size:22px">${synced}</div></div><div class="metric warning" style="border-top-width:4px"><div class="metric-label">Pending sync</div><div class="metric-value" style="font-size:22px">${total-synced}</div></div></div><div class="card"><div class="card-header"><h3>All documents</h3></div><div class="card-body">${S.docs.length===0?'<p style="color:var(--text-muted)">No documents uploaded yet.</p>':S.docs.map(d=>{const c=S.clients.find(x=>x.id===d.clientId);const[extClass,extLabel]=docExt(d.name);const s2=d.synced&&c?.gdriveUrl;return`<div class="doc-item"><div class="doc-icon doc-icon-${extClass}">${extLabel}</div><div style="flex:1;min-width:0"><div style="font-size:12px;font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${d.name}</div><div style="font-size:10px;color:var(--text-muted)">${c?.businessName||'Unknown'} · ${d.size||'—'} · ${new Date(d.uploadedAt).toLocaleDateString()}</div></div><span class="${s2?'gdrive-badge':'gdrive-badge gdrive-pending'}">${s2?'Synced':'Pending sync'}</span><button class="btn btn-sm" data-action="preview-doc" data-id="${d.id}" data-name="${d.name}" data-type="${extClass}" data-url="${d.dataUrl||''}">Preview</button><button class="btn btn-sm" data-action="go-client" data-id="${d.clientId}">View client</button></div>`;}).join('')}</div></div><div class="card"><div class="card-header"><h3>Google Drive integration</h3></div><div class="card-body"><p style="font-size:12px;color:var(--text-secondary);margin-bottom:10px">Link a Google Drive folder URL to each client profile to enable auto-sync. Documents will be marked synced when a Drive folder is linked.</p><a href="https://drive.google.com" target="_blank" class="btn btn-sm" style="text-decoration:none">Open Google Drive</a></div></div></div>`;
+}
+
+function rChecklists(){
+  return`<div class="page-header"><div><h2>Document Checklists</h2><div class="page-header-sub">Manage curated document request lists by service</div></div><button class="btn btn-success btn-sm" data-action="add-template">+ New checklist</button></div><div class="page-body">${S.docTemplates.map(tmpl=>`<div class="card"><div class="card-header"><div><h3>${tmpl.name}</h3><span style="font-size:11px;color:var(--text-muted);margin-left:8px">${tmpl.items.length} items</span></div><div style="display:flex;gap:5px"><button class="btn btn-sm" data-action="edit-template" data-id="${tmpl.id}">Edit</button><button class="btn btn-sm btn-danger" data-action="del-template" data-id="${tmpl.id}">Delete</button></div></div><div class="card-body"><div style="margin-bottom:10px">${tmpl.items.map(item=>`<div style="font-size:12px;padding:4px 0;border-bottom:1px solid #F0F4FA;display:flex;align-items:center;gap:7px"><span style="color:var(--green);font-size:14px">✓</span>${item}</div>`).join('')}</div><div style="background:#F0F6FF;border-radius:var(--radius);padding:10px;font-size:11px;color:var(--text-secondary)"><strong>Email subject:</strong> ${tmpl.emailSubject}</div></div></div>`).join('')}</div>`;
+}
+
+function rReminders(){
+  const pend=S.reminders.filter(r=>r.status==='pending'),sent=S.reminders.filter(r=>r.status==='sent');
+  const list=S.tab===0?pend:sent;
+  return`<div class="page-header"><div><h2>Reminders</h2><div class="page-header-sub">Review and approve before sending</div></div><button class="btn btn-success btn-sm" data-action="gen-reminders">Generate due date reminders</button></div><div class="page-body"><div class="tab-bar"><div class="tab ${S.tab===0?'active':''}" data-tab="0">Pending ${pend.length>0?`<span class="badge badge-danger" style="margin-left:5px">${pend.length}</span>`:''}</div><div class="tab ${S.tab===1?'active':''}" data-tab="1">Sent (${sent.length})</div></div>${list.length===0?`<div class="card"><div class="card-body"><p style="color:var(--text-muted)">${S.tab===0?'No reminders pending. Click "Generate due date reminders" to auto-create drafts.':'No sent reminders yet.'}</p></div></div>`:list.map(r=>{const c=S.clients.find(x=>x.id===r.clientId);return`<div class="card"><div class="card-header"><div style="display:flex;gap:5px;align-items:center;flex-wrap:wrap"><span style="font-weight:700">${c?.businessName||'Unknown'}</span><span class="badge ${r.status==='pending'?'badge-warning':'badge-success'}">${r.status}</span><span class="badge badge-teal">${(r.channel||'email').toUpperCase()}</span><span class="badge badge-purple">${r.serviceLabel||''}</span></div><span style="font-size:11px;color:var(--text-muted)">${new Date(r.createdAt).toLocaleDateString()}</span></div><div class="card-body"><pre style="font-size:12px;font-family:inherit;white-space:pre-wrap;background:#F0F6FF;padding:10px;border-radius:var(--radius);border:1.5px solid var(--card-border);margin-bottom:8px">${r.message}</pre>${r.status==='pending'?`<div style="display:flex;gap:5px"><button class="btn btn-success btn-sm" data-action="approve-rem" data-id="${r.id}">Approve &amp; send</button><button class="btn btn-sm" data-action="edit-rem" data-id="${r.id}">Edit</button><button class="btn btn-sm btn-danger" data-action="del-rem" data-id="${r.id}">Delete</button></div>`:''}</div></div>`;}).join('')}</div>`;
+}
+
+function rSettings(){
+  const isAdmin=S.user.role==='admin';
+  const api=S.apiConfig||DEF_API_CONFIG;
+  return`<div class="page-header"><div><h2>Settings</h2><div class="page-header-sub">Team, integrations &amp; tools</div></div></div><div class="page-body"><div class="card"><div class="card-header"><h3>Team members</h3></div><div class="card-body"><table class="table" style="margin-bottom:10px"><thead><tr><th>Name</th><th>Email</th><th>Role</th><th style="width:100px"></th></tr></thead><tbody>${S.users.map(u=>`<tr><td style="font-weight:600">${u.name}</td><td style="font-size:11px">${u.email}</td><td><span class="badge ${u.role==='admin'?'badge-info':'badge-gray'}">${u.role}</span></td><td>${isAdmin&&u.id!==S.user.id?`<button class="btn btn-sm btn-danger" data-action="del-user" data-id="${u.id}">Remove</button>`:'—'}</td></tr>`).join('')}</tbody></table>${isAdmin?`<button class="btn btn-primary btn-sm" data-action="add-user">+ Add team member</button>`:''}</div></div>
+
+<div class="card"><div class="card-header"><h3>🔧 API Integrations</h3><span style="font-size:11px;color:var(--text-muted)">Configure your external service credentials</span></div><div class="card-body">
+
+<div style="background:#FEF3C7;border:1.5px solid #FCD34D;border-radius:var(--radius);padding:10px 14px;margin-bottom:16px;font-size:12px;color:var(--amber)"><strong>⚠️ Security Note:</strong> API credentials are stored in your browser's localStorage. For production use, these should be stored securely on a backend server.</div>
+
+<div style="border-bottom:2px solid var(--card-border);margin-bottom:14px"></div>
+
+<div style="margin-bottom:20px"><h4 style="font-size:13px;font-weight:700;margin-bottom:8px;display:flex;align-items:center;gap:6px"><span style="width:24px;height:24px;background:#E8F5E9;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-size:12px">📱</span> Twilio (SMS Reminders)</h4><div style="background:#F0F6FF;border-radius:var(--radius);padding:12px;margin-bottom:10px"><div class="form-grid-3"><div class="form-group" style="margin-bottom:8px"><label class="form-label" style="font-size:10px">Account SID</label><input class="form-input" id="api-twilio-sid" value="${api.twilio?.accountSid||''}" placeholder="ACxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx" style="font-size:11px;padding:6px 10px"></div><div class="form-group" style="margin-bottom:8px"><label class="form-label" style="font-size:10px">Auth Token</label><input class="form-input" id="api-twilio-token" type="password" value="${api.twilio?.authToken||''}" placeholder="Your auth token" style="font-size:11px;padding:6px 10px"></div><div class="form-group" style="margin-bottom:8px"><label class="form-label" style="font-size:10px">Phone Number</label><input class="form-input" id="api-twilio-phone" value="${api.twilio?.phoneNumber||''}" placeholder="+15551234567" style="font-size:11px;padding:6px 10px"></div></div><label style="display:flex;align-items:center;gap:6px;font-size:12px;cursor:pointer"><input type="checkbox" id="api-twilio-enabled" ${api.twilio?.enabled?'checked':''} style="accent-color:var(--green)"> <span style="font-weight:600;color:var(--green)">Enable Twilio SMS</span></label></div><p style="font-size:11px;color:var(--text-muted)">Get credentials at <a href="https://console.twilio.com" target="_blank" style="color:var(--blue)">console.twilio.com</a> → Account Info</p></div>
+
+<div style="border-bottom:1px solid var(--card-border);margin:16px 0"></div>
+
+<div style="margin-bottom:20px"><h4 style="font-size:13px;font-weight:700;margin-bottom:8px;display:flex;align-items:center;gap:6px"><span style="width:24px;height:24px;background:#E3F2FD;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-size:12px">📁</span> Google Drive (Document Sync)</h4><div style="background:#F0F6FF;border-radius:var(--radius);padding:12px;margin-bottom:10px"><div class="form-group" style="margin-bottom:8px"><label class="form-label" style="font-size:10px">Service Account Email</label><input class="form-input" id="api-gdrive-email" value="${api.googleDrive?.serviceAccountEmail||''}" placeholder="your-service-account@project.iam.gserviceaccount.com" style="font-size:11px;padding:6px 10px"></div><div class="form-group" style="margin-bottom:8px"><label class="form-label" style="font-size:10px">Private Key (JSON)</label><textarea class="form-textarea" id="api-gdrive-key" rows="3" placeholder='Paste your service account private key here (starts with "-----BEGIN PRIVATE KEY-----")' style="font-size:10px;padding:6px 10px;font-family:monospace">${api.googleDrive?.privateKey||''}</textarea></div><label style="display:flex;align-items:center;gap:6px;font-size:12px;cursor:pointer"><input type="checkbox" id="api-gdrive-enabled" ${api.googleDrive?.enabled?'checked':''} style="accent-color:var(--green)"> <span style="font-weight:600;color:var(--green)">Enable Google Drive sync</span></label></div><p style="font-size:11px;color:var(--text-muted)">Get credentials at <a href="https://console.cloud.google.com" target="_blank" style="color:var(--blue)">console.cloud.google.com</a> → IAM & Admin → Service Accounts</p></div>
+
+<div style="border-bottom:1px solid var(--card-border);margin:16px 0"></div>
+
+<div style="margin-bottom:20px"><h4 style="font-size:13px;font-weight:700;margin-bottom:8px;display:flex;align-items:center;gap:6px"><span style="width:24px;height:24px;background:#E8F5E9;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-size:12px">📊</span> Google Sheets (Live Export)</h4><div style="background:#F0F6FF;border-radius:var(--radius);padding:12px;margin-bottom:10px"><div class="form-group" style="margin-bottom:8px"><label class="form-label" style="font-size:10px">Spreadsheet ID</label><input class="form-input" id="api-gsheet-id" value="${api.googleSheets?.spreadsheetId||''}" placeholder="1BxiMVs0XRA5nFMdKvBdBZjgmUUqptlbs74OgvE2upms" style="font-size:11px;padding:6px 10px"></div><div class="form-group" style="margin-bottom:8px"><label class="form-label" style="font-size:10px">Service Account Email</label><input class="form-input" id="api-gsheet-email" value="${api.googleSheets?.serviceAccountEmail||''}" placeholder="your-service-account@project.iam.gserviceaccount.com" style="font-size:11px;padding:6px 10px"></div><div class="form-group" style="margin-bottom:8px"><label class="form-label" style="font-size:10px">Private Key (JSON)</label><textarea class="form-textarea" id="api-gsheet-key" rows="3" placeholder="Paste service account private key" style="font-size:10px;padding:6px 10px;font-family:monospace">${api.googleSheets?.privateKey||''}</textarea></div><label style="display:flex;align-items:center;gap:6px;font-size:12px;cursor:pointer"><input type="checkbox" id="api-gsheet-enabled" ${api.googleSheets?.enabled?'checked':''} style="accent-color:var(--green)"> <span style="font-weight:600;color:var(--green)">Enable Google Sheets sync</span></label></div><p style="font-size:11px;color:var(--text-muted)">Find Spreadsheet ID in the URL: docs.google.com/spreadsheets/d/<strong>[ID HERE]</strong>/edit</p></div>
+
+<div style="border-bottom:1px solid var(--card-border);margin:16px 0"></div>
+
+<div style="margin-bottom:20px"><h4 style="font-size:13px;font-weight:700;margin-bottom:8px;display:flex;align-items:center;gap:6px"><span style="width:24px;height:24px;background:#FEE2E2;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-size:12px">✉️</span> Gmail (Email Reminders)</h4><div style="background:#F0F6FF;border-radius:var(--radius);padding:12px;margin-bottom:10px"><div class="form-grid-3"><div class="form-group" style="margin-bottom:8px"><label class="form-label" style="font-size:10px">Client ID</label><input class="form-input" id="api-gmail-cid" value="${api.gmail?.clientId||''}" placeholder="xxxxx.apps.googleusercontent.com" style="font-size:11px;padding:6px 10px"></div><div class="form-group" style="margin-bottom:8px"><label class="form-label" style="font-size:10px">Client Secret</label><input class="form-input" id="api-gmail-secret" type="password" value="${api.gmail?.clientSecret||''}" placeholder="Client secret" style="font-size:11px;padding:6px 10px"></div><div class="form-group" style="margin-bottom:8px"><label class="form-label" style="font-size:10px">Refresh Token</label><input class="form-input" id="api-gmail-refresh" type="password" value="${api.gmail?.refreshToken||''}" placeholder="Refresh token" style="font-size:11px;padding:6px 10px"></div></div><label style="display:flex;align-items:center;gap:6px;font-size:12px;cursor:pointer"><input type="checkbox" id="api-gmail-enabled" ${api.gmail?.enabled?'checked':''} style="accent-color:var(--green)"> <span style="font-weight:600;color:var(--green)">Enable Gmail sending</span></label></div><p style="font-size:11px;color:var(--text-muted)">Setup OAuth at <a href="https://console.cloud.google.com" target="_blank" style="color:var(--blue)">console.cloud.google.com</a> → APIs & Services → Credentials</p></div>
+
+<div style="border-bottom:1px solid var(--card-border);margin:16px 0"></div>
+
+<div style="margin-bottom:16px"><h4 style="font-size:13px;font-weight:700;margin-bottom:8px;display:flex;align-items:center;gap:6px"><span style="width:24px;height:24px;background:#EDE9FE;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-size:12px">💳</span> Square (Payment Sync)</h4><div style="background:#F0F6FF;border-radius:var(--radius);padding:12px;margin-bottom:10px"><div class="form-group" style="margin-bottom:8px"><label class="form-label" style="font-size:10px">Access Token</label><input class="form-input" id="api-square-token" type="password" value="${api.square?.accessToken||''}" placeholder="EAAAxxxxxxxxxx" style="font-size:11px;padding:6px 10px"></div><label style="display:flex;align-items:center;gap:6px;font-size:12px;cursor:pointer"><input type="checkbox" id="api-square-enabled" ${api.square?.enabled?'checked':''} style="accent-color:var(--green)"> <span style="font-weight:600;color:var(--green)">Enable Square sync</span></label></div><p style="font-size:11px;color:var(--text-muted)">Get token at <a href="https://developer.squareup.com" target="_blank" style="color:var(--blue)">developer.squareup.com</a> → Applications → Production Access Token</p></div>
+
+<div style="margin-top:16px;padding-top:16px;border-top:2px solid var(--card-border);display:flex;gap:8px;flex-wrap:wrap"><button class="btn btn-success" id="save-api-config">💾 Save all API credentials</button><button class="btn btn-sm" id="test-twilio">📱 Test Twilio SMS</button><button class="btn btn-sm" id="test-gmail">✉️ Test Gmail send</button><button class="btn btn-sm" id="sync-sheets">📊 Sync to Google Sheets now</button><button class="btn btn-sm" id="test-drive">📁 Test Drive upload</button><button class="btn btn-sm" id="sync-square">💳 Sync Square payments</button></div>
+
+</div></div>
+
+<div class="card"><div class="card-header"><h3>CARB compliance deadline reference</h3></div><div class="card-body"><div style="display:grid;grid-template-columns:1fr 1fr;gap:14px"><div><div class="section-divider">CA Registered Vehicles (by DMV expiry month)</div><table style="width:100%;font-size:11px;border-collapse:collapse"><thead><tr>${['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'].map(m=>`<th style="padding:4px 3px;text-align:center;background:#F0F6FF;border:1px solid var(--card-border)">${m}</th>`).join('')}</tr></thead><tbody><tr>${Object.values(CARB_CA).map(([a])=>`<td style="padding:4px 3px;text-align:center;border:1px solid var(--card-border);font-weight:700;color:var(--green)">${a}</td>`).join('')}</tr><tr>${Object.values(CARB_CA).map(([,b])=>`<td style="padding:4px 3px;text-align:center;border:1px solid var(--card-border);color:var(--blue)">${b}</td>`).join('')}</tr></tbody></table></div><div><div class="section-divider">Non-CA / DMV Exempt (by last VIN digit)</div><table style="width:100%;font-size:11px;border-collapse:collapse"><thead><tr>${[0,1,2,3,4,5,6,7,8,9].map(n=>`<th style="padding:4px 3px;text-align:center;background:#F0F6FF;border:1px solid var(--card-border)">${n}</th>`).join('')}</tr></thead><tbody><tr>${[0,1,2,3,4,5,6,7,8,9].map(n=>{const[a]=CARB_NOCA[n];return`<td style="padding:4px 3px;text-align:center;border:1px solid var(--card-border);font-weight:700;color:var(--green)">${a}</td>`;}).join('')}</tr><tr>${[0,1,2,3,4,5,6,7,8,9].map(n=>{const[,b]=CARB_NOCA[n];return`<td style="padding:4px 3px;text-align:center;border:1px solid var(--card-border);color:var(--blue)">${b}</td>`;}).join('')}</tr></tbody></table></div></div></div></div><div class="card"><div class="card-header"><h3>MCS-150 biennial update schedule</h3></div><div class="card-body"><p style="font-size:12px;color:var(--text-secondary);margin-bottom:8px">Filing is due every 24 months based on the last digit of the USDOT number:</p><table style="font-size:12px;border-collapse:collapse;width:100%"><thead><tr><th style="padding:6px 10px;background:#F0F6FF;border:1px solid var(--card-border)">Last digit of USDOT</th>${[1,2,3,4,5,6,7,8,9,0].map(n=>`<th style="padding:6px 8px;text-align:center;background:#F0F6FF;border:1px solid var(--card-border)">${n}</th>`).join('')}</tr></thead><tbody><tr><td style="padding:6px 10px;border:1px solid var(--card-border);font-weight:600">Filing month</td>${[1,2,3,4,5,6,7,8,9,0].map(n=>`<td style="padding:6px 8px;text-align:center;border:1px solid var(--card-border)">${MCS150_MONTH[n]?.slice(0,3)}</td>`).join('')}</tr></tbody></table></div></div><div class="card"><div class="card-header"><h3>💬 SMS Message Templates</h3><button class="btn btn-primary btn-sm" data-action="add-sms-tmpl">+ New template</button></div><div class="card-body" style="padding:0"><table class="table"><thead><tr><th style="width:30%">Template name</th><th style="width:15%">Category</th><th>Message preview</th><th style="width:110px"></th></tr></thead><tbody>${S.smsTemplates.map(t=>{const catColor={reminder:'badge-warning',documents:'badge-info',urgent:'badge-danger',general:'badge-success',custom:'badge-purple'};return`<tr><td style="font-weight:700;font-size:12px">${t.name}</td><td><span class="badge ${catColor[t.category]||'badge-gray'}">${t.category}</span></td><td style="font-size:11px;color:var(--text-muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:300px">${t.body?.slice(0,80)||'(empty)'}${t.body?.length>80?'…':''}</td><td><div style="display:flex;gap:4px"><button class="btn btn-sm" data-action="edit-sms-tmpl" data-id="${t.id}">Edit</button><button class="btn btn-sm btn-danger" data-action="del-sms-tmpl" data-id="${t.id}">✕</button></div></td></tr>`;}).join('')}</tbody></table></div></div><div class="card"><div class="card-header"><h3>Data export</h3></div><div class="card-body" style="display:flex;gap:6px;flex-wrap:wrap"><button class="btn btn-sm" data-action="export-clients">Export clients (CSV)</button><button class="btn btn-sm" data-action="export-trucks">Export trucks (CSV)</button><button class="btn btn-sm" data-action="export-docs">Export documents (CSV)</button></div></div><div class="card"><div class="card-header"><h3>Change my password</h3></div><div class="card-body"><div style="display:flex;gap:10px;max-width:440px;flex-wrap:wrap"><div style="flex:1"><label class="form-label">New password</label><input class="form-input" id="new-pass" type="password" placeholder="New password"></div><div style="flex:1"><label class="form-label">Confirm</label><input class="form-input" id="conf-pass" type="password" placeholder="Confirm"></div></div><button class="btn btn-primary btn-sm" id="change-pass-btn" style="margin-top:8px">Update password</button></div></div></div>`;
+}
+
+function rUnlinkedTrucks(){
+  const unlinked=S.trucks.filter(t=>!t.clientId||!S.clients.find(c=>c.id===t.clientId));
+  return`<div class="page-header"><div style="display:flex;align-items:center;gap:8px"><button class="btn btn-sm" id="back-btn" style="background:rgba(255,255,255,0.15);border-color:rgba(255,255,255,0.3);color:#fff">← Back</button><h2>Unlinked Trucks</h2></div></div><div class="page-body"><p style="font-size:12px;color:var(--text-secondary);margin-bottom:12px">These trucks are not linked to any client profile. Use "Link to client" to connect them to the correct owner.</p>${unlinked.length===0?`<div class="card"><div class="card-body"><p style="color:var(--text-muted)">All trucks are linked to a client.</p></div></div>`:unlinked.map(t=>`<div class="card"><div class="card-header"><span style="font-weight:700">${t.year||'?'} ${t.make||'?'} ${t.model||'?'} — Plate: ${t.plate||'?'}</span><button class="btn btn-primary btn-sm" data-action="link-truck" data-id="${t.id}">Link to client</button></div><div class="card-body"><p style="font-size:12px;color:var(--text-muted)">VIN: ${t.vin||'—'}</p></div></div>`).join('')}</div>`;
+}
+
+function rModal(){
+  const m=S.modal;
+  return`<div class="modal-overlay" id="m-overlay"><div class="modal ${m.type==='add-template'||m.type==='edit-template'?'modal-lg':''}">${
+    m.type==='add-client'?mClientForm(null):m.type==='edit-client'?mClientForm(m.data):
+    m.type==='add-truck'?mTruckForm(null,m.cid):m.type==='edit-truck'?mTruckForm(m.data,m.data?.clientId):
+    m.type==='link-truck'?mLinkTruck(m.data):
+    m.type==='add-activity'?mActForm(m.cid):m.type==='add-user'?mUserForm():
+    m.type==='set-gdrive'?mGDriveForm(m.data):
+    m.type==='create-reminder'?mRemForm(m.cid):m.type==='edit-rem'?mEditRem(m.data):
+    m.type==='add-template'?mTemplateForm(null):m.type==='edit-template'?mTemplateForm(m.data):
+    m.type==='send-checklist'?mSendChecklist(m.cid):
+    m.type==='send-text'?mSendText(m.cid):
+    m.type==='edit-sms-template'?mEditSmsTemplate(m.data):
+    m.type==='confirm-delete'?mConfirmDelete(m.msg,m.onConfirm):''
+  }</div></div>`;
+}
+function mH(t){return`<div class="modal-header"><h3>${t}</h3><button class="modal-close" id="close-m">✕</button></div>`;}
+
+function mClientForm(c){
+  const d=c||{name:'',businessName:'',phone:'',email:'',address:'',dotNumber:'',motorCarrierPermit:'',mcs150:'',mcs150Due:'',mcPermitDue:'',notes:'',services:[],gdriveUrl:'',isCARegistered:true};
+  return`${mH(c?'Edit client':'Add new client')}<div class="modal-body"><div class="form-grid"><div class="form-group"><label class="form-label">Owner full name</label><input class="form-input" id="f-name" value="${d.name||''}" placeholder="e.g. Jose Martinez"></div><div class="form-group"><label class="form-label">Business name</label><input class="form-input" id="f-biz" value="${d.businessName||''}" placeholder="e.g. Martinez Trucking LLC"></div><div class="form-group"><label class="form-label">Phone</label><input class="form-input" id="f-phone" value="${d.phone||''}" placeholder="(951) 555-0000"></div><div class="form-group"><label class="form-label">Email</label><input class="form-input" id="f-email" type="email" value="${d.email||''}" placeholder="owner@business.com"></div><div class="form-group" style="grid-column:1/-1"><label class="form-label">Address</label><input class="form-input" id="f-addr" value="${d.address||''}" placeholder="Street, City, CA ZIP"></div><div class="form-group"><label class="form-label">USDOT number</label><input class="form-input" id="f-dot" value="${d.dotNumber||''}" placeholder="DOT-1234567"></div><div class="form-group"><label class="form-label">Motor carrier permit #</label><input class="form-input" id="f-mc" value="${d.motorCarrierPermit||''}" placeholder="MC-000000"></div><div class="form-group"><label class="form-label">MC Permit due date</label><input class="form-input" id="f-mc-due" type="date" value="${d.mcPermitDue||''}"></div><div class="form-group"><label class="form-label">MCS-150 last filed</label><input class="form-input" id="f-mcs" type="date" value="${d.mcs150||''}"></div><div class="form-group"><label class="form-label">MCS-150 next due date</label><input class="form-input" id="f-mcs-due" type="date" value="${d.mcs150Due||''}" placeholder="Auto: last filed + 2 years"></div><div class="form-group" style="grid-column:1/-1"><label class="form-label">Registration type</label><select class="form-select" id="f-ca-reg"><option value="1" ${d.isCARegistered!==false?'selected':''}>CA Registered Vehicle</option><option value="0" ${d.isCARegistered===false?'selected':''}>Non-CA Registered / DMV Exempt Plated</option></select></div><div class="form-group" style="grid-column:1/-1"><label class="form-label">Google Drive folder URL (optional)</label><input class="form-input" id="f-gdrive" value="${d.gdriveUrl||''}" placeholder="https://drive.google.com/drive/folders/..."></div></div><div class="form-group"><label class="form-label" style="margin-bottom:6px">Services enrolled</label><div style="display:flex;flex-wrap:wrap">${ALL_SVCS.map(s=>`<label class="svc-check ${d.services?.includes(s)?'checked':''}" id="svc-lbl-${s}"><input type="checkbox" id="f-svc-${s}" ${d.services?.includes(s)?'checked':''}> ${SL[s]}</label>`).join('')}</div></div><div class="form-group"><label class="form-label">Notes</label><textarea class="form-textarea" id="f-notes" rows="2">${d.notes||''}</textarea></div></div><div class="modal-footer"><button class="btn" id="close-m">Cancel</button><button class="btn btn-primary" id="save-client" data-id="${d.id||''}">${c?'Save changes':'Add client'}</button></div>`;
+}
+
+function mTruckForm(t,cid){
+  const d=t||{vin:'',plate:'',year:'',make:'',model:'',weight:'80000',dmvExp:'',carbDue1:'',carbDue2:'',irs2290Due:'2025-08-31',mcPermitDue:'',mcs150Due:''};
+  const c=S.clients.find(x=>x.id===cid);
+  return`${mH(t?'Edit truck':'Add truck')}<div class="modal-body"><div class="form-grid"><div class="form-group" style="grid-column:1/-1"><label class="form-label">VIN number (17 characters)</label><input class="form-input" id="f-vin" value="${d.vin||''}" placeholder="17-character VIN" style="font-family:monospace;letter-spacing:1px" oninput="autoCarbDates(this.value,'${cid}')"></div><div class="form-group"><label class="form-label">License plate</label><input class="form-input" id="f-plate" value="${d.plate||''}" placeholder="CA-XXXXXXX"></div><div class="form-group"><label class="form-label">Year</label><input class="form-input" id="f-year" value="${d.year||''}" placeholder="e.g. 2022"></div><div class="form-group"><label class="form-label">Make</label><input class="form-input" id="f-make" value="${d.make||''}" placeholder="e.g. Kenworth"></div><div class="form-group"><label class="form-label">Model</label><input class="form-input" id="f-model" value="${d.model||''}" placeholder="e.g. T680"></div><div class="form-group"><label class="form-label">Gross vehicle weight (lbs)</label><input class="form-input" id="f-wgt" type="number" value="${d.weight||'80000'}"></div><div class="form-group"><label class="form-label" style="color:#1e40af">DMV reg expiration</label><input class="form-input" id="f-dmv" type="date" value="${d.dmvExp||''}" style="border-color:#7EB3E8;background:#EFF6FF" oninput="autoCarbFromDmv(this.value,'${cid}')"></div><div class="form-group"><label class="form-label" style="color:#065f46">CARB Check #1 due <span id="carb-hint" style="font-size:10px;font-weight:400">(auto-filled from calendar)</span></label><input class="form-input" id="f-carb1" type="date" value="${d.carbDue1||''}" style="border-color:#6EE7B7;background:#ECFDF5"></div><div class="form-group"><label class="form-label" style="color:#065f46">CARB Check #2 due</label><input class="form-input" id="f-carb2" type="date" value="${d.carbDue2||''}" style="border-color:#6EE7B7;background:#ECFDF5"></div><div class="form-group"><label class="form-label" style="color:#4c1d95">IRS Form 2290 due</label><input class="form-input" id="f-irs" type="date" value="${d.irs2290Due||'2025-08-31'}" style="border-color:#C4B5FD;background:#F5F3FF"></div><div class="form-group"><label class="form-label" style="color:#9D174D">MC Permit due</label><input class="form-input" id="f-mc-due2" type="date" value="${d.mcPermitDue||c?.mcPermitDue||''}"></div><div class="form-group"><label class="form-label" style="color:#92400e">MCS-150 due</label><input class="form-input" id="f-mcs-due2" type="date" value="${d.mcs150Due||c?.mcs150Due||''}"></div></div><div id="carb-auto-msg" style="display:none" class="carb-auto-hint">CARB dates auto-filled from compliance calendar. You can override manually.</div></div><div class="modal-footer"><button class="btn" id="close-m">Cancel</button><button class="btn btn-primary" id="save-truck" data-id="${d.id||''}" data-cid="${cid||''}">${t?'Save changes':'Add truck'}</button></div>`;
+}
+
+function mLinkTruck(truck){
+  return`${mH('Link truck to client')}<div class="modal-body"><p style="font-size:12px;color:var(--text-secondary);margin-bottom:14px">Select the client this truck belongs to. Truck: <strong>${truck?.year||'?'} ${truck?.make||'?'} ${truck?.model||'?'} (VIN: ${truck?.vin||'—'})</strong></p><div class="form-group"><label class="form-label">Select client</label><select class="form-select" id="f-link-client"><option value="">-- Select client --</option>${S.clients.map(c=>`<option value="${c.id}">${c.businessName} — ${c.name}</option>`).join('')}</select></div></div><div class="modal-footer"><button class="btn" id="close-m">Cancel</button><button class="btn btn-primary" id="save-link" data-truck="${truck?.id||''}">Link truck</button></div>`;
+}
+
+function mActForm(cid){
+  return`${mH('Log activity')}<div class="modal-body"><div class="form-group"><label class="form-label">Activity type</label><select class="form-select" id="f-atype"><option value="call">Phone call</option><option value="email">Email</option><option value="sms">SMS</option><option value="note">Note / memo</option></select></div><div class="form-group"><label class="form-label">Notes / summary</label><textarea class="form-textarea" id="f-anote" rows="4" placeholder="What was discussed?"></textarea></div></div><div class="modal-footer"><button class="btn" id="close-m">Cancel</button><button class="btn btn-primary" id="save-act" data-cid="${cid}">Save activity</button></div>`;
+}
+
+function mUserForm(){
+  return`${mH('Add team member')}<div class="modal-body"><div class="form-group"><label class="form-label">Full name</label><input class="form-input" id="f-uname" placeholder="e.g. Sarah Johnson"></div><div class="form-group"><label class="form-label">Email</label><input class="form-input" id="f-uemail" type="email" placeholder="sarah@atcompliance.com"></div><div class="form-group"><label class="form-label">Temporary password</label><input class="form-input" id="f-upass" type="password"></div><div class="form-group"><label class="form-label">Role</label><select class="form-select" id="f-urole"><option value="member">Team member</option><option value="admin">Administrator</option></select></div></div><div class="modal-footer"><button class="btn" id="close-m">Cancel</button><button class="btn btn-primary" id="save-user">Add member</button></div>`;
+}
+
+function mGDriveForm(c){
+  return`${mH(`Link Google Drive — ${c?.businessName||''}`)}<div class="modal-body"><p style="font-size:12px;color:var(--text-secondary);margin-bottom:12px;padding:10px;background:#F0F6FF;border-radius:var(--radius);border-left:3px solid var(--blue)">Paste the Google Drive folder URL for this client. Once linked, documents uploaded here will automatically be marked as synced and you can open the folder directly from the client profile.</p><div class="form-group"><label class="form-label">Google Drive folder URL</label><input class="form-input" id="f-gd-url" value="${c?.gdriveUrl||''}" placeholder="https://drive.google.com/drive/folders/..."></div></div><div class="modal-footer"><button class="btn" id="close-m">Cancel</button><button class="btn btn-primary" id="save-gdrive" data-id="${c?.id||''}">Save Drive link</button></div>`;
+}
+
+function mRemForm(cid){
+  const c=S.clients.find(x=>x.id===cid);
+  return`${mH(`Create reminder — ${c?.businessName||''}`)}<div class="modal-body"><div class="form-grid"><div class="form-group"><label class="form-label">Service</label><select class="form-select" id="f-rsvc">${(c?.services||[]).map(s=>`<option value="${s}">${SL[s]||s}</option>`).join('')}</select></div><div class="form-group"><label class="form-label">Channel</label><select class="form-select" id="f-rch"><option value="email">Email</option><option value="sms">SMS</option><option value="both">Both</option></select></div></div><div class="form-group"><label class="form-label">Message</label><textarea class="form-textarea" id="f-rmsg" rows="7">Hi ${c?.name||''},\n\nThis is a reminder from American Trucking Compliance regarding an upcoming compliance deadline. Please contact us at your earliest convenience.\n\nThank you,\nAmerican Trucking Compliance Team</textarea></div><p style="font-size:11px;color:var(--amber);padding:7px 10px;background:var(--amber-light);border-radius:var(--radius)">This reminder must be approved before sending.</p></div><div class="modal-footer"><button class="btn" id="close-m">Cancel</button><button class="btn btn-primary" id="save-rem" data-cid="${cid}">Save for approval</button></div>`;
+}
+
+function mEditRem(r){
+  return`${mH('Edit reminder')}<div class="modal-body"><div class="form-group"><label class="form-label">Message</label><textarea class="form-textarea" id="f-emsg" rows="9">${r?.message||''}</textarea></div></div><div class="modal-footer"><button class="btn" id="close-m">Cancel</button><button class="btn btn-primary" id="update-rem" data-id="${r?.id||''}">Update</button></div>`;
+}
+
+function mTemplateForm(tmpl){
+  const d=tmpl||{name:'',service:'',items:[],emailSubject:'',emailBody:''};
+  const isEdit=!!tmpl;
+  return`${mH(isEdit?'Edit checklist template':'New checklist template')}<div class="modal-body"><div class="form-grid"><div class="form-group"><label class="form-label">Template name</label><input class="form-input" id="f-tmpl-name" value="${d.name||''}" placeholder="e.g. DMV Renewal Documents"></div><div class="form-group"><label class="form-label">Service type</label><select class="form-select" id="f-tmpl-svc">${Object.entries({dmv_renewal:'DMV Renewal',dmv_new:'DMV New Registration',dmv_title:'Title Transfer',dmv_vin:'VIN Verification',dmv_mcp:'Motor Carrier Permit',dmv_epn:'EPN',irs2290:'IRS Form 2290',carb:'CARB Clean Truck Check',mcs150:'MCS-150'}).map(([k,v])=>`<option value="${k}" ${d.service===k?'selected':''}>${v}</option>`).join('')}</select></div><div class="form-group" style="grid-column:1/-1"><label class="form-label">Email subject</label><input class="form-input" id="f-tmpl-subj" value="${d.emailSubject||''}" placeholder="Email subject line"></div></div><div class="form-group"><label class="form-label">Required document items (one per line)</label><textarea class="form-textarea" id="f-tmpl-items" rows="8" placeholder="Each line = one required item">${(d.items||[]).join('\n')}</textarea></div><div class="form-group"><label class="form-label">Email body template</label><textarea class="form-textarea" id="f-tmpl-body" rows="6" placeholder="Use [Client Name], [DOCUMENT LIST], [GOOGLE DRIVE LINK] as placeholders">${d.emailBody||''}</textarea></div></div><div class="modal-footer"><button class="btn" id="close-m">Cancel</button><button class="btn btn-primary" id="save-template" data-id="${d.id||''}">${isEdit?'Save changes':'Create template'}</button></div>`;
+}
+
+function mSendChecklist(cid){
+  const c=S.clients.find(x=>x.id===cid);
+  const relevant=S.docTemplates.filter(t=>{
+    if(c.services.includes('dmv')&&t.service.startsWith('dmv'))return true;
+    if(c.services.includes('irs2290')&&t.service==='irs2290')return true;
+    if(c.services.includes('carb')&&t.service==='carb')return true;
+    if(c.services.includes('mcs150')&&t.service==='mcs150')return true;
+    return false;
+  });
+  const sel=relevant[0];
+  const body=sel?(sel.emailBody||'').replace('[Client Name]',c?.name||'').replace('[DOCUMENT LIST]',sel.items.map(i=>`• ${i}`).join('\n')).replace('[GOOGLE DRIVE LINK]',c?.gdriveUrl||'[Please contact us for your upload link]'):'';
+  return`${mH(`Send checklist email — ${c?.businessName||''}`)}<div class="modal-body"><div class="form-group"><label class="form-label">Select checklist</label><select class="form-select" id="f-tmpl-sel" onchange="previewChecklist(this.value,'${cid}')">${relevant.map(t=>`<option value="${t.id}">${t.name}</option>`).join('')}</select></div><div class="form-group"><label class="form-label">To</label><input class="form-input" id="f-send-to" value="${c?.email||''}" type="email"></div><div class="form-group"><label class="form-label">Subject</label><input class="form-input" id="f-send-subj" value="${sel?.emailSubject||''}"></div><div class="form-group"><label class="form-label">Message</label><textarea class="form-textarea" id="f-send-body" rows="10">${body}</textarea></div><p style="font-size:11px;color:var(--text-muted)">This will open your default email client with the message pre-filled.</p></div><div class="modal-footer"><button class="btn" id="close-m">Cancel</button><button class="btn btn-primary" id="send-checklist-btn" data-cid="${cid}">Open in email client</button></div>`;
+}
+
+function mSendText(cid){
+  const c=S.clients.find(x=>x.id===cid);
+  const cats={reminder:'🔔 Reminders',documents:'📄 Documents',urgent:'🚨 Urgent',general:'💬 General',custom:'✏️ Custom'};
+  const grouped={};
+  S.smsTemplates.forEach(t=>{if(!grouped[t.category])grouped[t.category]=[];grouped[t.category].push(t);});
+  const twilioEnabled=S.apiConfig?.twilio?.enabled&&S.apiConfig?.twilio?.accountSid;
+  return`${mH(`💬 Send Text — ${c?.businessName||''}`)}<div class="modal-body">
+${!twilioEnabled?`<div style="background:#FEF3C7;border:1.5px solid #FCD34D;border-radius:var(--radius);padding:10px 14px;margin-bottom:12px;font-size:12px;color:var(--amber)">⚠️ Twilio SMS is not configured. Go to <strong>Settings → API Integrations</strong> to add your Twilio credentials, then you can send live texts. You can still compose and copy messages below.</div>`:`<div style="background:#E8F5E9;border:1.5px solid #A5D6A7;border-radius:var(--radius);padding:10px 14px;margin-bottom:12px;font-size:12px;color:var(--green)">✅ Twilio connected — texts will be sent to <strong>${c?.phone||'(no phone on file)'}</strong></div>`}
+<div class="form-group"><label class="form-label">Select a message template</label>
+<div style="max-height:220px;overflow-y:auto;border:2px solid var(--input-border);border-radius:var(--radius);background:var(--input-bg)">
+${Object.entries(grouped).map(([cat,tmpls])=>`
+  <div style="padding:6px 10px 2px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:var(--text-muted);background:#E8F0FA;border-bottom:1px solid var(--card-border)">${cats[cat]||cat}</div>
+  ${tmpls.map(t=>`<div class="sms-tmpl-row" data-id="${t.id}" style="padding:8px 12px;cursor:pointer;border-bottom:1px solid #F0F4FA;display:flex;align-items:center;justify-content:space-between;gap:8px">
+    <div>
+      <div style="font-size:12px;font-weight:700;color:var(--text-primary)">${t.name}</div>
+      ${t.body?`<div style="font-size:11px;color:var(--text-muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:400px">${t.body.replace('[Client Name]',c?.name||'').slice(0,80)}${t.body.length>80?'…':''}</div>`:'<div style="font-size:11px;color:var(--text-muted);font-style:italic">Blank — type your own message</div>'}
+    </div>
+    <button class="btn btn-sm" style="flex-shrink:0;font-size:10px" data-edit-sms="${t.id}">Edit</button>
+  </div>`).join('')}
+`).join('')}
+</div></div>
+<div class="form-group"><label class="form-label">To: phone number</label><input class="form-input" id="sms-to" value="${c?.phone||''}" placeholder="+15551234567"></div>
+<div class="form-group"><label class="form-label" style="display:flex;align-items:center;justify-content:space-between">Message <span id="sms-char-count" style="font-size:10px;color:var(--text-muted);font-weight:400">0 / 160 chars</span></label>
+<textarea class="form-textarea" id="sms-body" rows="5" placeholder="Select a template above or type a custom message here…" oninput="document.getElementById('sms-char-count').textContent=this.value.length+' / 160 chars';document.getElementById('sms-char-count').style.color=this.value.length>160?'var(--red)':'var(--text-muted)'"></textarea></div>
+<p style="font-size:11px;color:var(--text-muted)">Messages over 160 characters are split into two texts. Use <strong>[Client Name]</strong> as a placeholder — it auto-fills the client's first name.</p>
+</div><div class="modal-footer" style="justify-content:space-between"><div><button class="btn btn-sm" id="sms-copy-btn">📋 Copy message</button></div><div style="display:flex;gap:6px"><button class="btn" id="close-m">Cancel</button><button class="btn btn-primary" id="sms-send-btn" data-cid="${cid}" style="background:#25D366;border-color:#1ebe57">💬 Send Text</button></div></div>`;
+}
+
+function mEditSmsTemplate(tmpl){
+  const d=tmpl||{name:'',category:'general',body:''};
+  const cats={reminder:'Reminder',documents:'Documents',urgent:'Urgent',general:'General',custom:'Custom'};
+  return`${mH(tmpl?'Edit SMS template':'New SMS template')}<div class="modal-body">
+<div class="form-grid"><div class="form-group"><label class="form-label">Template name</label><input class="form-input" id="f-sms-name" value="${d.name||''}" placeholder="e.g. DMV Renewal Reminder"></div>
+<div class="form-group"><label class="form-label">Category</label><select class="form-select" id="f-sms-cat">${Object.entries(cats).map(([k,v])=>`<option value="${k}" ${d.category===k?'selected':''}>${v}</option>`).join('')}</select></div></div>
+<div class="form-group"><label class="form-label" style="display:flex;align-items:center;justify-content:space-between">Message body <span style="font-size:10px;color:var(--text-muted);font-weight:400">Use [Client Name] as placeholder</span></label>
+<textarea class="form-textarea" id="f-sms-body" rows="5" placeholder="Type your template message here…">${d.body||''}</textarea></div>
+<div style="background:#F0F6FF;border-radius:var(--radius);padding:10px;font-size:11px;color:var(--text-secondary)">💡 <strong>Tip:</strong> Keep messages under 160 characters to avoid split texts. Use <strong>[Client Name]</strong> and it will be replaced with the client's actual name when sent.</div>
+</div><div class="modal-footer"><button class="btn" id="close-m">Cancel</button><button class="btn btn-primary" id="save-sms-tmpl" data-id="${d.id||''}">Save template</button></div>`;
+}
+
+function mConfirmDelete(msg,onConfirm){
+  return`${mH('Confirm delete')}<div class="modal-body"><p style="font-size:13px;color:var(--text-primary);padding:12px;background:var(--red-light);border-radius:var(--radius);border-left:3px solid var(--red)">${msg}</p></div><div class="modal-footer"><button class="btn" id="close-m">Cancel</button><button class="btn btn-danger-solid" id="confirm-del-btn">Yes, delete permanently</button></div>`;
+}
+
+// CARB auto-fill helpers (exposed globally for oninput)
+window.autoCarbDates=function(vin,cid){
+  const c=S.clients.find(x=>x.id===cid);
+  if(!c||c.isCARegistered!==false||!vin||vin.length<1)return;
+  const last=parseInt(vin[vin.length-1]);
+  const pair=CARB_NOCA[last];
+  if(!pair)return;
+  const d1=document.getElementById('f-carb1');const d2=document.getElementById('f-carb2');const msg=document.getElementById('carb-auto-msg');
+  if(d1)d1.value=monthToNextDate(pair[0]);
+  if(d2)d2.value=monthToNextDate(pair[1]);
+  if(msg)msg.style.display='block';
+};
+window.autoCarbFromDmv=function(dmvDate,cid){
+  const c=S.clients.find(x=>x.id===cid);
+  if(!c||c.isCARegistered===false||!dmvDate)return;
+  const m=new Date(dmvDate).getMonth()+1;
+  const pair=CARB_CA[m];if(!pair)return;
+  const d1=document.getElementById('f-carb1');const d2=document.getElementById('f-carb2');const msg=document.getElementById('carb-auto-msg');
+  if(d1)d1.value=monthToNextDate(pair[0]);
+  if(d2)d2.value=monthToNextDate(pair[1]);
+  if(msg)msg.style.display='block';
+};
+window.previewChecklist=function(tmplId,cid){
+  const c=S.clients.find(x=>x.id===cid);const t=S.docTemplates.find(x=>x.id===tmplId);if(!t||!c)return;
+  const body=(t.emailBody||'').replace('[Client Name]',c.name||'').replace('[DOCUMENT LIST]',t.items.map(i=>`• ${i}`).join('\n')).replace('[GOOGLE DRIVE LINK]',c.gdriveUrl||'[Upload link]');
+  const subj=document.getElementById('f-send-subj');const bodyEl=document.getElementById('f-send-body');
+  if(subj)subj.value=t.emailSubject||'';
+  if(bodyEl)bodyEl.value=body;
+};
+
+async function genReminders(){
+  let n=0;
+  S.trucks.forEach(t=>{
+    const c=S.clients.find(x=>x.id===t.clientId);if(!c)return;
+    const checks=[
+      {svc:'dmv',date:t.dmvExp,label:SL.dmv},{svc:'carb',date:t.carbDue1,label:'Clean Truck Check #1'},
+      {svc:'carb',date:t.carbDue2,label:'Clean Truck Check #2'},{svc:'irs2290',date:t.irs2290Due,label:SL.irs2290},
+      {svc:'mcs150',date:t.mcs150Due||c.mcs150Due,label:SL.mcs150},{svc:'mc_permit',date:t.mcPermitDue||c.mcPermitDue,label:SL.mc_permit}
+    ];
+    checks.forEach(ch=>{
+      if(!c.services.includes(ch.svc)||!ch.date)return;
+      const days=dU(ch.date);if(days===null||days>90)return;
+      if(S.reminders.find(r=>r.clientId===c.id&&r.service===ch.svc&&r.truckId===t.id&&r.serviceLabel===ch.label&&r.status==='pending'))return;
+      const urg=days<0?`is OVERDUE by ${Math.abs(days)} days`:days<=30?`is due in ${days} days`:days<=60?`is coming up in ${days} days`:`is scheduled in ${days} days`;
+      S.reminders.push({id:uid(),clientId:c.id,truckId:t.id,userId:S.user.id,service:ch.svc,serviceLabel:ch.label,channel:'email',message:`Hi ${c.name},\n\nThis is an important compliance reminder from American Trucking Compliance.\n\nYour ${ch.label} for your ${t.year} ${t.make} ${t.model} (Plate: ${t.plate}) ${urg}${days>=0?' — due '+fD(ch.date):''}.\n\nPlease contact us immediately so we can assist you.\n\nSincerely,\nAmerican Trucking Compliance Team\n(951) 555-0000`,status:'pending',createdAt:new Date().toISOString()});
+      n++;
+    });
+  });
+  saveDB();return n;
+}
+
+// ─────────────────────────────────────────────
+// TWILIO SMS — FULLY FUNCTIONAL
+// ─────────────────────────────────────────────
+async function sendTwilioSMS(to,message){
+  const cfg=S.apiConfig?.twilio;
+  if(!cfg||!cfg.enabled||!cfg.accountSid||!cfg.authToken||!cfg.phoneNumber){
+    notify('Twilio not configured or not enabled. Go to Settings → API Integrations.','error');
+    return false;
+  }
+  // Normalize phone: strip non-digits then add +1 if needed
+  let phone=to.replace(/\D/g,'');
+  if(phone.length===10)phone='+1'+phone;
+  else if(phone.length===11&&phone[0]==='1')phone='+'+phone;
+  else phone='+'+phone;
+  try{
+    const auth=btoa(`${cfg.accountSid}:${cfg.authToken}`);
+    const params=new URLSearchParams({To:phone,From:cfg.phoneNumber,Body:message});
+    const resp=await fetch(`https://api.twilio.com/2010-04-01/Accounts/${cfg.accountSid}/Messages.json`,{
+      method:'POST',
+      headers:{'Authorization':`Basic ${auth}`,'Content-Type':'application/x-www-form-urlencoded'},
+      body:params.toString()
+    });
+    const data=await resp.json();
+    if(!resp.ok||data.status==='failed'){
+      notify(`Twilio error: ${data.message||data.error_message||'Unknown error'}`,'error');
+      return false;
+    }
+    return true;
+  }catch(e){
+    notify(`SMS failed: ${e.message}`,'error');
+    return false;
+  }
+}
+
+// ─────────────────────────────────────────────
+// GMAIL — OAuth2 access token refresh + send
+// ─────────────────────────────────────────────
+async function getGmailAccessToken(){
+  const cfg=S.apiConfig?.gmail;
+  if(!cfg?.clientId||!cfg?.clientSecret||!cfg?.refreshToken)return null;
+  try{
+    const resp=await fetch('https://oauth2.googleapis.com/token',{
+      method:'POST',
+      headers:{'Content-Type':'application/x-www-form-urlencoded'},
+      body:new URLSearchParams({client_id:cfg.clientId,client_secret:cfg.clientSecret,refresh_token:cfg.refreshToken,grant_type:'refresh_token'}).toString()
+    });
+    const data=await resp.json();
+    if(data.access_token){
+      // Cache token with expiry
+      S.apiConfig.gmail._accessToken=data.access_token;
+      S.apiConfig.gmail._tokenExpiry=Date.now()+(data.expires_in-60)*1000;
+      return data.access_token;
+    }
+    notify(`Gmail token error: ${data.error_description||data.error}`,'error');
+    return null;
+  }catch(e){notify(`Gmail auth failed: ${e.message}`,'error');return null;}
+}
+
+async function sendGmailEmail(to,subject,bodyText){
+  const cfg=S.apiConfig?.gmail;
+  if(!cfg||!cfg.enabled){
+    // Fallback to mailto
+    window.location.href=`mailto:${encodeURIComponent(to)}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(bodyText)}`;
+    return false;
+  }
+  // Use cached token if still valid
+  let token=cfg._accessToken&&cfg._tokenExpiry>Date.now()?cfg._accessToken:await getGmailAccessToken();
+  if(!token){
+    notify('Gmail: could not get access token. Check credentials in Settings.','error');
+    window.location.href=`mailto:${encodeURIComponent(to)}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(bodyText)}`;
+    return false;
+  }
+  try{
+    // Build RFC 2822 message
+    const msg=[
+      `To: ${to}`,
+      `Subject: ${subject}`,
+      'MIME-Version: 1.0',
+      'Content-Type: text/plain; charset=UTF-8',
+      '',
+      bodyText
+    ].join('\r\n');
+    // Base64url encode
+    const encoded=btoa(unescape(encodeURIComponent(msg))).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'');
+    const resp=await fetch('https://gmail.googleapis.com/gmail/v1/users/me/messages/send',{
+      method:'POST',
+      headers:{'Authorization':`Bearer ${token}`,'Content-Type':'application/json'},
+      body:JSON.stringify({raw:encoded})
+    });
+    const data=await resp.json();
+    if(!resp.ok){
+      notify(`Gmail send error: ${data.error?.message||'Unknown'}`,'error');
+      return false;
+    }
+    return true;
+  }catch(e){notify(`Gmail send failed: ${e.message}`,'error');return false;}
+}
+
+// ─────────────────────────────────────────────
+// GOOGLE DRIVE — Service Account JWT + upload
+// ─────────────────────────────────────────────
+async function getGoogleAccessToken(scope){
+  const cfg=S.apiConfig?.googleDrive;
+  if(!cfg?.serviceAccountEmail||!cfg?.privateKey)return null;
+  try{
+    // Build JWT
+    const now=Math.floor(Date.now()/1000);
+    const header=btoa(JSON.stringify({alg:'RS256',typ:'JWT'})).replace(/=/g,'').replace(/\+/g,'-').replace(/\//g,'_');
+    const claim=btoa(JSON.stringify({iss:cfg.serviceAccountEmail,scope,aud:'https://oauth2.googleapis.com/token',exp:now+3600,iat:now})).replace(/=/g,'').replace(/\+/g,'-').replace(/\//g,'_');
+    const unsigned=`${header}.${claim}`;
+    // Import private key
+    const pemBody=cfg.privateKey.replace(/-----BEGIN PRIVATE KEY-----|-----END PRIVATE KEY-----|\n|\r/g,'');
+    const keyBytes=Uint8Array.from(atob(pemBody),c=>c.charCodeAt(0));
+    const cryptoKey=await crypto.subtle.importKey('pkcs8',keyBytes.buffer,{name:'RSASSA-PKCS1-v1_5',hash:'SHA-256'},false,['sign']);
+    const sigBytes=await crypto.subtle.sign('RSASSA-PKCS1-v1_5',cryptoKey,new TextEncoder().encode(unsigned));
+    const sig=btoa(String.fromCharCode(...new Uint8Array(sigBytes))).replace(/=/g,'').replace(/\+/g,'-').replace(/\//g,'_');
+    const jwt=`${unsigned}.${sig}`;
+    // Exchange for access token
+    const resp=await fetch('https://oauth2.googleapis.com/token',{
+      method:'POST',
+      headers:{'Content-Type':'application/x-www-form-urlencoded'},
+      body:new URLSearchParams({grant_type:'urn:ietf:params:oauth:grant-type:jwt-bearer',assertion:jwt}).toString()
+    });
+    const data=await resp.json();
+    return data.access_token||null;
+  }catch(e){console.error('Google token error',e);return null;}
+}
+
+// Extract folder ID from a Drive URL
+function driveUrlToFolderId(url){
+  if(!url)return null;
+  const m=url.match(/folders\/([a-zA-Z0-9_-]+)/);
+  return m?m[1]:null;
+}
+
+async function uploadToGoogleDrive(clientId,fileName,dataUrl){
+  const cfg=S.apiConfig?.googleDrive;
+  const c=S.clients.find(x=>x.id===clientId);
+  if(!cfg||!cfg.enabled){return false;}
+  const folderId=driveUrlToFolderId(c?.gdriveUrl);
+  const token=await getGoogleAccessToken('https://www.googleapis.com/auth/drive.file');
+  if(!token){notify('Google Drive: authentication failed. Check service account credentials.','error');return false;}
+  try{
+    // Convert dataUrl to blob
+    const[meta,b64]=dataUrl.split(',');
+    const mime=meta.match(/:(.*?);/)[1];
+    const bytes=Uint8Array.from(atob(b64),c=>c.charCodeAt(0));
+    // Multipart upload
+    const boundary='ATC_CRM_BOUNDARY';
+    const metaPart=JSON.stringify({name:fileName,...(folderId?{parents:[folderId]}:{})});
+    const body=`--${boundary}\r\nContent-Type: application/json; charset=UTF-8\r\n\r\n${metaPart}\r\n--${boundary}\r\nContent-Type: ${mime}\r\nContent-Transfer-Encoding: base64\r\n\r\n${btoa(String.fromCharCode(...bytes))}\r\n--${boundary}--`;
+    const resp=await fetch('https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart',{
+      method:'POST',
+      headers:{'Authorization':`Bearer ${token}`,'Content-Type':`multipart/related; boundary=${boundary}`},
+      body
+    });
+    const data=await resp.json();
+    if(!resp.ok){notify(`Drive upload error: ${data.error?.message||'Unknown'}`,'error');return false;}
+    return data.id||true;
+  }catch(e){notify(`Drive upload failed: ${e.message}`,'error');return false;}
+}
+
+// ─────────────────────────────────────────────
+// GOOGLE SHEETS — append / update rows
+// ─────────────────────────────────────────────
+async function getSheetsToken(){
+  // Reuse Drive service account for Sheets if emails match
+  const driveCfg=S.apiConfig?.googleDrive;
+  const sheetCfg=S.apiConfig?.googleSheets;
+  // Prefer sheets-specific key, fall back to drive
+  const email=sheetCfg?.serviceAccountEmail||driveCfg?.serviceAccountEmail;
+  const key=sheetCfg?.privateKey||driveCfg?.privateKey;
+  if(!email||!key)return null;
+  const tmpCfg={serviceAccountEmail:email,privateKey:key};
+  const saved=S.apiConfig.googleDrive;
+  S.apiConfig.googleDrive=tmpCfg;
+  const token=await getGoogleAccessToken('https://www.googleapis.com/auth/spreadsheets');
+  S.apiConfig.googleDrive=saved;
+  return token;
+}
+
+async function sheetsAppend(sheetName,values){
+  const cfg=S.apiConfig?.googleSheets;
+  if(!cfg?.enabled||!cfg?.spreadsheetId)return false;
+  const token=await getSheetsToken();
+  if(!token){notify('Google Sheets: auth failed. Check credentials.','error');return false;}
+  try{
+    const id=encodeURIComponent(cfg.spreadsheetId);
+    const range=encodeURIComponent(`${sheetName}!A1`);
+    const resp=await fetch(`https://sheets.googleapis.com/v4/spreadsheets/${id}/values/${range}:append?valueInputOption=USER_ENTERED&insertDataOption=INSERT_ROWS`,{
+      method:'POST',
+      headers:{'Authorization':`Bearer ${token}`,'Content-Type':'application/json'},
+      body:JSON.stringify({values})
+    });
+    const data=await resp.json();
+    if(!resp.ok){notify(`Sheets error: ${data.error?.message||'Unknown'}`,'error');return false;}
+    return true;
+  }catch(e){notify(`Sheets append failed: ${e.message}`,'error');return false;}
+}
+
+async function sheetsClearAndWrite(sheetName,rows){
+  const cfg=S.apiConfig?.googleSheets;
+  if(!cfg?.enabled||!cfg?.spreadsheetId)return false;
+  const token=await getSheetsToken();
+  if(!token)return false;
+  try{
+    const id=encodeURIComponent(cfg.spreadsheetId);
+    const range=encodeURIComponent(`${sheetName}!A1:ZZ`);
+    // Clear first
+    await fetch(`https://sheets.googleapis.com/v4/spreadsheets/${id}/values/${range}:clear`,{
+      method:'POST',headers:{'Authorization':`Bearer ${token}`,'Content-Type':'application/json'}
+    });
+    // Then write
+    const writeRange=encodeURIComponent(`${sheetName}!A1`);
+    const resp=await fetch(`https://sheets.googleapis.com/v4/spreadsheets/${id}/values/${writeRange}?valueInputOption=USER_ENTERED`,{
+      method:'PUT',
+      headers:{'Authorization':`Bearer ${token}`,'Content-Type':'application/json'},
+      body:JSON.stringify({values:rows})
+    });
+    return resp.ok;
+  }catch(e){notify(`Sheets write failed: ${e.message}`,'error');return false;}
+}
+
+// Full CRM sync to Google Sheets (all tabs)
+async function syncAllToSheets(){
+  const cfg=S.apiConfig?.googleSheets;
+  if(!cfg?.enabled||!cfg?.spreadsheetId){notify('Google Sheets not configured or not enabled.','error');return;}
+  notify('Syncing to Google Sheets...');
+  const clientRows=[['Business Name','Owner','Phone','Email','DOT','MC Permit','MC Permit Due','MCS-150 Filed','MCS-150 Due','CA Registered','Services','Drive URL','Notes','Created'],...S.clients.map(c=>[c.businessName,c.name,c.phone,c.email,c.dotNumber,c.motorCarrierPermit,c.mcPermitDue,c.mcs150,c.mcs150Due,c.isCARegistered?'Yes':'No',c.services.map(s=>SL[s]).join('; '),c.gdriveUrl,c.notes,c.createdAt?.split('T')[0]])];
+  const truckRows=[['Business','VIN','Plate','Year','Make','Model','GVW','DMV Exp','CARB Due 1','CARB Due 2','IRS Due','MC Permit Due','MCS-150 Due','DMV Paid','CARB Paid','IRS Paid','DMV Compliant','CARB Compliant','IRS Compliant'],...S.trucks.map(t=>{const c=S.clients.find(x=>x.id===t.clientId);return[c?.businessName||'Unlinked',t.vin,t.plate,t.year,t.make,t.model,t.weight,t.dmvExp,t.carbDue1,t.carbDue2,t.irs2290Due,t.mcPermitDue||c?.mcPermitDue,t.mcs150Due||c?.mcs150Due,t.dmvPaid?'Yes':'No',t.carbPaid?'Yes':'No',t.irsPaid?'Yes':'No',t.dmvCompliant?'Yes':'No',t.carbCompliant?'Yes':'No',t.irsCompliant?'Yes':'No'];})];
+  const reminderRows=[['Client','Service','Channel','Status','Sent At','Created'],...S.reminders.map(r=>{const c=S.clients.find(x=>x.id===r.clientId);return[c?.businessName||'',r.serviceLabel||r.service,r.channel,r.status,r.sentAt||'',r.createdAt?.split('T')[0]];})];
+  const [r1,r2,r3]=await Promise.all([sheetsClearAndWrite('Clients',clientRows),sheetsClearAndWrite('Trucks',truckRows),sheetsClearAndWrite('Reminders',reminderRows)]);
+  if(r1&&r2&&r3)notify('Google Sheets synced successfully! ✅');
+  else notify('Some sheets may not have synced. Check credentials.','warning');
+}
+
+function showDocPreview(id,name,type,dataUrl){
+  const root=document.getElementById('doc-preview-root');if(!root)return;
+  const isImg=type==='img';const isPdf=type==='pdf';
+  let inner='<div style="display:flex;align-items:center;justify-content:center;height:100%;color:#888;font-size:14px">Preview not available for this file type. Download to view.</div>';
+  if(dataUrl&&isImg)inner=`<img class="img-preview" src="${dataUrl}" alt="${name}">`;
+  else if(dataUrl&&isPdf)inner=`<iframe src="${dataUrl}" title="${name}"></iframe>`;
+  root.innerHTML=`<div class="doc-preview-wrap" id="preview-wrap"><div class="doc-preview-inner"><div class="doc-preview-header"><span>${name}</span><button onclick="document.getElementById('doc-preview-root').innerHTML=''" style="background:rgba(255,255,255,0.15);border:none;color:#fff;padding:5px 10px;border-radius:6px;cursor:pointer;font-size:12px">✕ Close</button></div><div class="doc-preview-body">${inner}</div></div></div>`;
+}
+
+function exportCSV(type){
+  let h,rows;
+  if(type==='clients'){h=['Business','Owner','Phone','Email','DOT','MC Permit','MC Permit Due','MCS-150 Filed','MCS-150 Due','CA Registered','Services','Drive URL','Notes'];rows=S.clients.map(c=>[c.businessName,c.name,c.phone,c.email,c.dotNumber,c.motorCarrierPermit,c.mcPermitDue,c.mcs150,c.mcs150Due,c.isCARegistered?'Yes':'No',c.services.map(s=>SL[s]).join('; '),c.gdriveUrl,c.notes]);}
+  else if(type==='trucks'){h=['Business','VIN','Plate','Year','Make','Model','GVW','DMV Exp','CARB1','CARB2','IRS Due','MC Permit Due','MCS-150 Due','DMV Paid','CARB Paid','IRS Paid','DMV Compliant','CARB Compliant','IRS Compliant'];rows=S.trucks.map(t=>{const c=S.clients.find(x=>x.id===t.clientId);return[c?.businessName||'Unlinked',t.vin,t.plate,t.year,t.make,t.model,t.weight,t.dmvExp,t.carbDue1,t.carbDue2,t.irs2290Due,t.mcPermitDue||c?.mcPermitDue,t.mcs150Due||c?.mcs150Due,t.dmvPaid?'Yes':'No',t.carbPaid?'Yes':'No',t.irsPaid?'Yes':'No',t.dmvCompliant?'Yes':'No',t.carbCompliant?'Yes':'No',t.irsCompliant?'Yes':'No'];});}
+  else{h=['Client','File name','Size','Uploaded','By','Synced'];rows=S.docs.map(d=>{const c=S.clients.find(x=>x.id===d.clientId);const u=S.users.find(x=>x.id===d.userId);return[c?.businessName||'',d.name,d.size,new Date(d.uploadedAt).toLocaleDateString(),u?.name||'',d.synced?'Yes':'No'];});}
+  const csv=[h,...rows].map(r=>r.map(v=>'"'+(v||'').toString().replace(/"/g,'""')+'"').join(',')).join('\n');
+  const a=document.createElement('a');a.href='data:text/csv;charset=utf-8,'+encodeURIComponent(csv);a.download=`atc-${type}-${new Date().toISOString().split('T')[0]}.csv`;a.click();
+}
+
+function bindAll(){
+  document.getElementById('signout-btn')?.addEventListener('click',()=>{S.user=null;S.view='login';saveDB();render();});
+  document.querySelectorAll('[data-nav]').forEach(el=>el.addEventListener('click',()=>{S.view=el.dataset.nav;S.tab=0;S.filter='';S.selectedClient=null;render();}));
+  document.getElementById('back-btn')?.addEventListener('click',()=>{if(S.view==='client-detail'){S.view='clients';S.selectedClient=null;}else S.view='dashboard';render();});
+  document.querySelectorAll('[data-tab]').forEach(el=>el.addEventListener('click',()=>{S.tab=parseInt(el.dataset.tab);render();}));
+  document.getElementById('client-search')?.addEventListener('input',e=>{S.filter=e.target.value;render();});
+  document.getElementById('add-client-btn')?.addEventListener('click',()=>{S.modal={type:'add-client'};render();bindModal();});
+  document.querySelectorAll('[data-action="view"]').forEach(el=>el.addEventListener('click',()=>{S.selectedClient=el.dataset.id;S.view='client-detail';S.tab=0;render();}));
+  document.querySelectorAll('[data-action="view-unlinked"]').forEach(el=>el.addEventListener('click',()=>{S.view='unlinked';render();}));
+  document.querySelectorAll('[data-action="edit-client"]').forEach(el=>el.addEventListener('click',()=>{const c=S.clients.find(x=>x.id===el.dataset.id);S.modal={type:'edit-client',data:c};render();bindModal();}));
+  document.querySelectorAll('[data-action="del-client"]').forEach(el=>el.addEventListener('click',()=>{
+    const id=el.dataset.id;const c=S.clients.find(x=>x.id===id);
+    S.modal={type:'confirm-delete',msg:`Delete "${c?.businessName||'this client'}" and all associated trucks and records? This cannot be undone.`,onConfirm:async()=>{S.clients=S.clients.filter(x=>x.id!==id);S.trucks=S.trucks.filter(t=>t.clientId!==id);S.activities=S.activities.filter(a=>a.clientId!==id);S.reminders=S.reminders.filter(r=>r.clientId!==id);S.docs=S.docs.filter(d=>d.clientId!==id);saveDB();S.modal=null;S.view='clients';S.selectedClient=null;render();notify('Client deleted');}};
+    render();bindModal();
+  }));
+  document.querySelectorAll('[data-action="add-truck"]').forEach(el=>el.addEventListener('click',()=>{S.modal={type:'add-truck',cid:el.dataset.cid};render();bindModal();}));
+  document.querySelectorAll('[data-action="edit-truck"]').forEach(el=>el.addEventListener('click',()=>{const t=S.trucks.find(x=>x.id===el.dataset.id);S.modal={type:'edit-truck',data:t};render();bindModal();}));
+  document.querySelectorAll('[data-action="link-truck"]').forEach(el=>el.addEventListener('click',()=>{const t=S.trucks.find(x=>x.id===el.dataset.id);S.modal={type:'link-truck',data:t};render();bindModal();}));
+  document.querySelectorAll('[data-action="toggle-paid"]').forEach(el=>el.addEventListener('click',()=>{const t=S.trucks.find(x=>x.id===el.dataset.truck);if(t){t[el.dataset.field]=!t[el.dataset.field];saveDB();render();notify('Payment status updated');};}));
+  document.querySelectorAll('[data-action="toggle-compliant"]').forEach(el=>el.addEventListener('click',()=>{const t=S.trucks.find(x=>x.id===el.dataset.truck);if(t){t[el.dataset.field]=!t[el.dataset.field];saveDB();render();notify(`Compliance status updated`);};}));
+  document.querySelectorAll('[data-action="add-activity"]').forEach(el=>el.addEventListener('click',()=>{S.modal={type:'add-activity',cid:el.dataset.cid};render();bindModal();}));
+  document.querySelectorAll('[data-action="create-reminder"]').forEach(el=>el.addEventListener('click',()=>{S.modal={type:'create-reminder',cid:el.dataset.cid};render();bindModal();}));
+  document.querySelectorAll('[data-action="approve-rem"]').forEach(el=>el.addEventListener('click',async()=>{
+    const r=S.reminders.find(x=>x.id===el.dataset.id);
+    if(!r)return;
+    const c=S.clients.find(x=>x.id===r.clientId);
+    if(!c){notify('Client not found','error');return;}
+    
+    // Send based on channel
+    let sent=false;
+    if(r.channel==='sms'||r.channel==='both'){
+      if(c.phone){
+        sent=await sendTwilioSMS(c.phone,r.message);
+        if(sent)notify('SMS sent successfully via Twilio!');
+      }else{
+        notify('Client has no phone number for SMS','error');
+      }
+    }
+    if(r.channel==='email'||r.channel==='both'){
+      if(c.email){
+        await sendGmailEmail(c.email,`Compliance Reminder — ${r.serviceLabel}`,r.message);
+      }else{
+        notify('Client has no email address','error');
+      }
+    }
+    
+    // Mark as sent
+    r.status='sent';
+    r.sentAt=new Date().toISOString();
+    saveDB();
+    render();
+    // Auto-sync reminders tab to Google Sheets if enabled
+    if(S.apiConfig?.googleSheets?.enabled){
+      const reminderRows=[['Client','Service','Channel','Status','Sent At','Created'],...S.reminders.map(rm=>{const cl=S.clients.find(x=>x.id===rm.clientId);return[cl?.businessName||'',rm.serviceLabel||rm.service,rm.channel,rm.status,rm.sentAt||'',rm.createdAt?.split('T')[0]];})];
+      sheetsClearAndWrite('Reminders',reminderRows).then(ok=>{if(ok)notify('Reminder sent & Sheets updated ✅');});
+    }
+  }));
+  document.querySelectorAll('[data-action="edit-rem"]').forEach(el=>el.addEventListener('click',()=>{const r=S.reminders.find(x=>x.id===el.dataset.id);S.modal={type:'edit-rem',data:r};render();bindModal();}));
+  document.querySelectorAll('[data-action="del-rem"]').forEach(el=>el.addEventListener('click',()=>{S.reminders=S.reminders.filter(x=>x.id!==el.dataset.id);saveDB();render();notify('Reminder deleted');}));
+  document.querySelectorAll('[data-action="add-user"]').forEach(el=>el.addEventListener('click',()=>{S.modal={type:'add-user'};render();bindModal();}));
+  document.querySelectorAll('[data-action="del-user"]').forEach(el=>el.addEventListener('click',()=>{S.users=S.users.filter(x=>x.id!==el.dataset.id);saveDB();render();notify('Team member removed');}));
+  document.querySelectorAll('[data-action="gen-reminders"]').forEach(el=>el.addEventListener('click',async()=>{const n=await genReminders();S.view='reminders';S.tab=0;render();notify(n>0?`${n} reminder draft(s) created`:'All drafts already exist','warning');}));
+  document.querySelectorAll('[data-action="go-client"]').forEach(el=>el.addEventListener('click',()=>{S.selectedClient=el.dataset.id;S.view='client-detail';S.tab=3;render();}));
+  document.querySelectorAll('[data-action="set-gdrive"]').forEach(el=>el.addEventListener('click',()=>{const c=S.clients.find(x=>x.id===el.dataset.id);S.modal={type:'set-gdrive',data:c};render();bindModal();}));
+  document.querySelectorAll('[data-action="del-doc"]').forEach(el=>el.addEventListener('click',()=>{S.docs=S.docs.filter(x=>x.id!==el.dataset.id);saveDB();render();notify('Document removed');}));
+  document.querySelectorAll('[data-action="preview-doc"]').forEach(el=>el.addEventListener('click',()=>showDocPreview(el.dataset.id,el.dataset.name,el.dataset.type,el.dataset.url)));
+  document.querySelectorAll('[data-action="add-template"]').forEach(el=>el.addEventListener('click',()=>{S.modal={type:'add-template'};render();bindModal();}));
+  document.querySelectorAll('[data-action="edit-template"]').forEach(el=>el.addEventListener('click',()=>{const t=S.docTemplates.find(x=>x.id===el.dataset.id);S.modal={type:'edit-template',data:t};render();bindModal();}));
+  document.querySelectorAll('[data-action="del-template"]').forEach(el=>el.addEventListener('click',()=>{S.docTemplates=S.docTemplates.filter(x=>x.id!==el.dataset.id);saveDB();render();notify('Checklist deleted');}));
+  document.querySelectorAll('[data-action="send-text"]').forEach(el=>el.addEventListener('click',()=>{S.modal={type:'send-text',cid:el.dataset.cid};render();bindModal();}));
+  document.querySelectorAll('[data-action="add-sms-tmpl"]').forEach(el=>el.addEventListener('click',()=>{S.modal={type:'edit-sms-template',data:null};render();bindModal();}));
+  document.querySelectorAll('[data-action="edit-sms-tmpl"]').forEach(el=>el.addEventListener('click',()=>{const t=S.smsTemplates.find(x=>x.id===el.dataset.id);S.modal={type:'edit-sms-template',data:t};render();bindModal();}));
+  document.querySelectorAll('[data-action="del-sms-tmpl"]').forEach(el=>el.addEventListener('click',()=>{
+    const t=S.smsTemplates.find(x=>x.id===el.dataset.id);
+    S.modal={type:'confirm-delete',msg:`Delete SMS template "${t?.name||'this template'}"? This cannot be undone.`,onConfirm:async()=>{S.smsTemplates=S.smsTemplates.filter(x=>x.id!==el.dataset.id);saveDB();S.modal=null;render();notify('SMS template deleted');}};
+    render();bindModal();
+  }));
+  document.querySelectorAll('[data-action="add-sms-tmpl"]').forEach(el=>el.addEventListener('click',()=>{S.modal={type:'edit-sms-template',data:null};render();bindModal();}));
+  document.querySelectorAll('[data-action="edit-sms-tmpl"]').forEach(el=>el.addEventListener('click',()=>{const t=S.smsTemplates.find(x=>x.id===el.dataset.id);S.modal={type:'edit-sms-template',data:t};render();bindModal();}));
+  document.querySelectorAll('[data-action="del-sms-tmpl"]').forEach(el=>el.addEventListener('click',()=>{S.smsTemplates=S.smsTemplates.filter(x=>x.id!==el.dataset.id);saveDB();render();notify('SMS template deleted');}));
+  document.querySelectorAll('[data-action="export-clients"]').forEach(el=>el.addEventListener('click',()=>exportCSV('clients')));
+  document.querySelectorAll('[data-action="export-trucks"]').forEach(el=>el.addEventListener('click',()=>exportCSV('trucks')));
+  document.querySelectorAll('[data-action="export-docs"]').forEach(el=>el.addEventListener('click',()=>exportCSV('docs')));
+  document.querySelectorAll('[data-client]').forEach(el=>el.addEventListener('click',()=>{S.selectedClient=el.dataset.client;S.view='client-detail';S.tab=1;render();}));
+  document.getElementById('upload-doc-btn')?.addEventListener('click',()=>{triggerUpload(document.getElementById('upload-doc-btn').dataset.cid);});
+  document.querySelectorAll('[id^="drop-zone-"]').forEach(dz=>{
+    const cid=dz.dataset.cid;
+    dz.addEventListener('click',()=>triggerUpload(cid));
+    dz.addEventListener('dragover',e=>{e.preventDefault();dz.classList.add('dragover');});
+    dz.addEventListener('dragleave',()=>dz.classList.remove('dragover'));
+    dz.addEventListener('drop',e=>{e.preventDefault();dz.classList.remove('dragover');processFiles(Array.from(e.dataTransfer.files),cid);});
+  });
+  document.getElementById('change-pass-btn')?.addEventListener('click',()=>{
+    const np=document.getElementById('new-pass')?.value,cp=document.getElementById('conf-pass')?.value;
+    if(!np){notify('Enter a new password','error');return;}
+    if(np!==cp){notify('Passwords do not match','error');return;}
+    const u=S.users.find(x=>x.id===S.user.id);if(u){u.password=np;saveDB();notify('Password updated!');}
+  });
+  
+  // Save API config
+  document.getElementById('save-api-config')?.addEventListener('click',()=>{
+    S.apiConfig={
+      twilio:{
+        accountSid:document.getElementById('api-twilio-sid')?.value||'',
+        authToken:document.getElementById('api-twilio-token')?.value||'',
+        phoneNumber:document.getElementById('api-twilio-phone')?.value||'',
+        enabled:document.getElementById('api-twilio-enabled')?.checked||false
+      },
+      googleDrive:{
+        serviceAccountEmail:document.getElementById('api-gdrive-email')?.value||'',
+        privateKey:document.getElementById('api-gdrive-key')?.value||'',
+        enabled:document.getElementById('api-gdrive-enabled')?.checked||false
+      },
+      googleSheets:{
+        spreadsheetId:document.getElementById('api-gsheet-id')?.value||'',
+        serviceAccountEmail:document.getElementById('api-gsheet-email')?.value||'',
+        privateKey:document.getElementById('api-gsheet-key')?.value||'',
+        enabled:document.getElementById('api-gsheet-enabled')?.checked||false
+      },
+      gmail:{
+        clientId:document.getElementById('api-gmail-cid')?.value||'',
+        clientSecret:document.getElementById('api-gmail-secret')?.value||'',
+        refreshToken:document.getElementById('api-gmail-refresh')?.value||'',
+        enabled:document.getElementById('api-gmail-enabled')?.checked||false
+      },
+      square:{
+        accessToken:document.getElementById('api-square-token')?.value||'',
+        enabled:document.getElementById('api-square-enabled')?.checked||false
+      }
+    };
+    saveDB();
+    notify('API credentials saved securely!');
+  });
+  
+  // Test Twilio
+  document.getElementById('test-twilio')?.addEventListener('click',async()=>{
+    const phone=prompt('Enter a phone number to test (format: +15551234567):');
+    if(!phone)return;
+    notify('Sending test SMS...');
+    const sent=await sendTwilioSMS(phone,'✅ Test from American Trucking Compliance CRM. Twilio is connected and working!');
+    if(sent)notify('Test SMS sent! Check your phone. ✅');
+  });
+
+  // Test Gmail
+  document.getElementById('test-gmail')?.addEventListener('click',async()=>{
+    const to=prompt('Enter an email address to test:');
+    if(!to)return;
+    notify('Sending test email...');
+    const sent=await sendGmailEmail(to,'Test Email — ATC CRM','This is a test email from American Trucking Compliance CRM.\n\nGmail is connected and working correctly.\n\nAmerican Trucking Compliance');
+    if(sent)notify('Test email sent via Gmail! ✅');
+  });
+
+  // Sync to Google Sheets
+  document.getElementById('sync-sheets')?.addEventListener('click',async()=>{
+    await syncAllToSheets();
+  });
+
+  // Test Google Drive
+  document.getElementById('test-drive')?.addEventListener('click',async()=>{
+    const cfg=S.apiConfig?.googleDrive;
+    if(!cfg?.enabled||!cfg?.serviceAccountEmail||!cfg?.privateKey){notify('Google Drive not configured or not enabled.','error');return;}
+    notify('Testing Google Drive connection...');
+    const testData='data:text/plain;base64,'+btoa('ATC CRM Google Drive connection test — '+new Date().toLocaleString());
+    const testClient=S.clients.find(c=>c.gdriveUrl)||S.clients[0];
+    const result=await uploadToGoogleDrive(testClient?.id||'test','ATC_CRM_connection_test.txt',testData);
+    if(result)notify('Google Drive connection successful! Test file uploaded. ✅');
+  });
+
+  // Sync Square payments
+  document.getElementById('sync-square')?.addEventListener('click',async()=>{
+    await checkSquarePayments();
+  });
+  // Unlinked trucks page
+  if(S.view==='unlinked'){
+    const root2=document.querySelector('.main');
+    if(root2){root2.innerHTML=rUnlinkedTrucks();bindAll();}
+  }
+}
+
+function triggerUpload(cid){
+  const inp=document.createElement('input');inp.type='file';inp.multiple=true;inp.accept='.pdf,.doc,.docx,.xls,.xlsx,.csv,.png,.jpg,.jpeg,.gif,.webp,.txt';
+  inp.onchange=e=>processFiles(Array.from(e.target.files),cid);
+  inp.click();
+}
+
+function processFiles(files,clientId){
+  const c=S.clients.find(x=>x.id===clientId);
+  files.forEach(f=>{
+    const reader=new FileReader();
+    reader.onload=async ev=>{
+      const doc={id:uid(),clientId,name:f.name,size:fmtSize(f.size),userId:S.user.id,uploadedAt:new Date().toISOString(),synced:false,dataUrl:ev.target.result};
+      S.docs.push(doc);
+      // Auto-upload to Google Drive if enabled and client has a folder
+      if(S.apiConfig?.googleDrive?.enabled&&c?.gdriveUrl){
+        notify(`Uploading ${f.name} to Google Drive...`);
+        const result=await uploadToGoogleDrive(clientId,f.name,ev.target.result);
+        if(result){doc.synced=true;doc.driveFileId=typeof result==='string'?result:undefined;notify(`${f.name} uploaded to Google Drive ✅`);}
+        else{notify(`Drive upload failed for ${f.name} — saved locally only`,'warning');}
+      }else{
+        doc.synced=!!(c?.gdriveUrl);
+      }
+      saveDB();render();
+    };reader.readAsDataURL(f);
+  });
+  notify(`${files.length} document(s) uploading...`);
+}
+
+function bindModal(){
+  document.querySelectorAll('#close-m').forEach(el=>el.addEventListener('click',()=>{S.modal=null;render();}));
+  document.getElementById('m-overlay')?.addEventListener('click',e=>{if(e.target.id==='m-overlay'){S.modal=null;render();}});
+  document.querySelectorAll('.svc-check').forEach(el=>el.addEventListener('click',()=>{const cb=el.querySelector('input[type=checkbox]');if(document.activeElement!==cb)cb.checked=!cb.checked;el.classList.toggle('checked',cb.checked);}));
+  document.getElementById('confirm-del-btn')?.addEventListener('click',()=>{if(S.modal?.onConfirm)S.modal.onConfirm();});
+  document.getElementById('save-client')?.addEventListener('click',()=>{
+    const id=document.getElementById('save-client').dataset.id;
+    const svcs=ALL_SVCS.filter(s=>document.getElementById(`f-svc-${s}`)?.checked);
+    const mcs=document.getElementById('f-mcs').value;
+    let mcsDue=document.getElementById('f-mcs-due').value;
+    if(!mcsDue&&mcs){const d=new Date(mcs);d.setFullYear(d.getFullYear()+2);mcsDue=d.toISOString().split('T')[0];}
+    const data={id:id||uid(),name:document.getElementById('f-name').value,businessName:document.getElementById('f-biz').value,phone:document.getElementById('f-phone').value,email:document.getElementById('f-email').value,address:document.getElementById('f-addr').value,dotNumber:document.getElementById('f-dot').value,motorCarrierPermit:document.getElementById('f-mc').value,mcPermitDue:document.getElementById('f-mc-due').value,mcs150:mcs,mcs150Due:mcsDue,gdriveUrl:document.getElementById('f-gdrive').value,notes:document.getElementById('f-notes').value,services:svcs,isCARegistered:document.getElementById('f-ca-reg').value==='1',createdAt:id?S.clients.find(x=>x.id===id)?.createdAt:new Date().toISOString()};
+    if(id){const i=S.clients.findIndex(x=>x.id===id);S.clients[i]=data;}else S.clients.push(data);
+    saveDB();S.modal=null;if(id){S.selectedClient=id;S.view='client-detail';}render();notify(id?'Client updated!':'New client added!');
+    // Auto-sync to Sheets
+    if(S.apiConfig?.googleSheets?.enabled){const rows=[['Business Name','Owner','Phone','Email','DOT','MC Permit','MC Due','MCS-150 Filed','MCS-150 Due','CA Registered','Services','Drive URL','Notes'],...S.clients.map(c=>[c.businessName,c.name,c.phone,c.email,c.dotNumber,c.motorCarrierPermit,c.mcPermitDue,c.mcs150,c.mcs150Due,c.isCARegistered?'Yes':'No',c.services.map(s=>SL[s]).join('; '),c.gdriveUrl,c.notes])];sheetsClearAndWrite('Clients',rows).then(ok=>{if(ok)notify('Client saved & Sheets updated ✅');});}
+  });
+  document.getElementById('save-truck')?.addEventListener('click',()=>{
+    const btn=document.getElementById('save-truck');const id=btn.dataset.id;const cid=btn.dataset.cid;
+    const data={id:id||uid(),clientId:cid,vin:document.getElementById('f-vin').value,plate:document.getElementById('f-plate').value,year:document.getElementById('f-year').value,make:document.getElementById('f-make').value,model:document.getElementById('f-model').value,weight:document.getElementById('f-wgt').value,dmvExp:document.getElementById('f-dmv').value,carbDue1:document.getElementById('f-carb1').value,carbDue2:document.getElementById('f-carb2').value,irs2290Due:document.getElementById('f-irs').value,mcPermitDue:document.getElementById('f-mc-due2').value,mcs150Due:document.getElementById('f-mcs-due2').value,dmvPaid:id?S.trucks.find(x=>x.id===id)?.dmvPaid||false:false,carbPaid:id?S.trucks.find(x=>x.id===id)?.carbPaid||false:false,irsPaid:id?S.trucks.find(x=>x.id===id)?.irsPaid||false:false,dmvCompliant:id?S.trucks.find(x=>x.id===id)?.dmvCompliant||false:false,carbCompliant:id?S.trucks.find(x=>x.id===id)?.carbCompliant||false:false,irsCompliant:id?S.trucks.find(x=>x.id===id)?.irsCompliant||false:false};
+    if(id){const i=S.trucks.findIndex(x=>x.id===id);S.trucks[i]=data;}else S.trucks.push(data);
+    saveDB();S.modal=null;S.selectedClient=cid;S.view='client-detail';S.tab=1;render();notify(id?'Truck updated!':'Truck added!');
+    if(S.apiConfig?.googleSheets?.enabled){const rows=[['Business','VIN','Plate','Year','Make','Model','GVW','DMV Exp','CARB1','CARB2','IRS Due','MC Permit Due','MCS-150 Due'],...S.trucks.map(t=>{const c=S.clients.find(x=>x.id===t.clientId);return[c?.businessName||'Unlinked',t.vin,t.plate,t.year,t.make,t.model,t.weight,t.dmvExp,t.carbDue1,t.carbDue2,t.irs2290Due,t.mcPermitDue||c?.mcPermitDue,t.mcs150Due||c?.mcs150Due];})];sheetsClearAndWrite('Trucks',rows).then(ok=>{if(ok)notify('Truck saved & Sheets updated ✅');});}
+  });
+  document.getElementById('save-link')?.addEventListener('click',()=>{
+    const truckId=document.getElementById('save-link').dataset.truck;const clientId=document.getElementById('f-link-client').value;
+    if(!clientId){notify('Please select a client','error');return;}
+    const t=S.trucks.find(x=>x.id===truckId);if(t){t.clientId=clientId;saveDB();}
+    S.modal=null;render();notify('Truck linked to client!');
+  });
+  document.getElementById('save-act')?.addEventListener('click',()=>{
+    const cid=document.getElementById('save-act').dataset.cid;
+    S.activities.push({id:uid(),clientId:cid,userId:S.user.id,type:document.getElementById('f-atype').value,note:document.getElementById('f-anote').value,createdAt:new Date().toISOString()});
+    saveDB();S.modal=null;S.tab=2;render();notify('Activity logged!');
+  });
+  document.getElementById('save-user')?.addEventListener('click',()=>{
+    const name=document.getElementById('f-uname').value,email=document.getElementById('f-uemail').value;
+    if(!name||!email){notify('Name and email required','error');return;}
+    S.users.push({id:uid(),name,email,password:document.getElementById('f-upass').value||'changeme',role:document.getElementById('f-urole').value});
+    saveDB();S.modal=null;render();notify('Team member added!');
+  });
+  document.getElementById('save-gdrive')?.addEventListener('click',()=>{
+    const id=document.getElementById('save-gdrive').dataset.id;const c=S.clients.find(x=>x.id===id);
+    if(c){c.gdriveUrl=document.getElementById('f-gd-url').value;S.docs.filter(d=>d.clientId===id).forEach(d=>d.synced=true);}
+    saveDB();S.modal=null;render();notify('Google Drive folder linked!');
+  });
+  document.getElementById('save-rem')?.addEventListener('click',()=>{
+    const cid=document.getElementById('save-rem').dataset.cid;const svc=document.getElementById('f-rsvc')?.value||'';
+    S.reminders.push({id:uid(),clientId:cid,userId:S.user.id,service:svc,serviceLabel:SL[svc]||svc,channel:document.getElementById('f-rch').value,message:document.getElementById('f-rmsg').value,status:'pending',createdAt:new Date().toISOString()});
+    saveDB();S.modal=null;S.tab=4;render();notify('Reminder saved — pending approval');
+  });
+  document.getElementById('update-rem')?.addEventListener('click',()=>{
+    const id=document.getElementById('update-rem').dataset.id;const r=S.reminders.find(x=>x.id===id);
+    if(r){r.message=document.getElementById('f-emsg').value;saveDB();}
+    S.modal=null;render();notify('Reminder updated!');
+  });
+  document.getElementById('save-template')?.addEventListener('click',()=>{
+    const id=document.getElementById('save-template').dataset.id;
+    const items=document.getElementById('f-tmpl-items').value.split('\n').map(s=>s.trim()).filter(Boolean);
+    const data={id:id||uid(),name:document.getElementById('f-tmpl-name').value,service:document.getElementById('f-tmpl-svc').value,items,emailSubject:document.getElementById('f-tmpl-subj').value,emailBody:document.getElementById('f-tmpl-body').value};
+    if(id){const i=S.docTemplates.findIndex(x=>x.id===id);S.docTemplates[i]=data;}else S.docTemplates.push(data);
+    saveDB();S.modal=null;render();notify(id?'Checklist updated!':'Checklist created!');
+  });
+  // Send Text modal — template row click to fill message
+  document.querySelectorAll('.sms-tmpl-row').forEach(row=>{
+    row.addEventListener('click',e=>{
+      if(e.target.closest('[data-edit-sms]'))return; // handled separately
+      const id=row.dataset.id;
+      const tmpl=S.smsTemplates.find(x=>x.id===id);
+      if(!tmpl)return;
+      const cid=document.getElementById('sms-send-btn')?.dataset.cid;
+      const c=S.clients.find(x=>x.id===cid);
+      const body=(tmpl.body||'').replace(/\[Client Name\]/g,c?.name?.split(' ')[0]||c?.name||'');
+      const ta=document.getElementById('sms-body');
+      if(ta){ta.value=body;ta.dispatchEvent(new Event('input'));}
+      // Highlight selected row
+      document.querySelectorAll('.sms-tmpl-row').forEach(r=>r.style.background='');
+      row.style.background='#EEF4FF';
+    });
+    // Edit button inside template row — open edit modal
+    const editBtn=row.querySelector('[data-edit-sms]');
+    editBtn?.addEventListener('click',e=>{
+      e.stopPropagation();
+      const tmpl=S.smsTemplates.find(x=>x.id===editBtn.dataset.editSms);
+      S.modal={type:'edit-sms-template',data:tmpl};render();bindModal();
+    });
+  });
+
+  // Copy message button
+  document.getElementById('sms-copy-btn')?.addEventListener('click',()=>{
+    const body=document.getElementById('sms-body')?.value||'';
+    if(!body){notify('No message to copy','error');return;}
+    navigator.clipboard?.writeText(body).then(()=>notify('Message copied to clipboard!')).catch(()=>{
+      // Fallback
+      const ta=document.createElement('textarea');ta.value=body;document.body.appendChild(ta);ta.select();document.execCommand('copy');document.body.removeChild(ta);notify('Message copied!');
+    });
+  });
+
+  // Send Text button
+  document.getElementById('sms-send-btn')?.addEventListener('click',async()=>{
+    const cid=document.getElementById('sms-send-btn').dataset.cid;
+    const to=document.getElementById('sms-to')?.value?.trim();
+    const body=document.getElementById('sms-body')?.value?.trim();
+    const c=S.clients.find(x=>x.id===cid);
+    if(!to){notify('Please enter a phone number','error');return;}
+    if(!body){notify('Please enter a message','error');return;}
+    if(!S.apiConfig?.twilio?.enabled){
+      notify('Twilio not enabled — message copied to clipboard. Configure Twilio in Settings to send live texts.','warning');
+      navigator.clipboard?.writeText(body);
+      return;
+    }
+    document.getElementById('sms-send-btn').textContent='Sending…';
+    document.getElementById('sms-send-btn').disabled=true;
+    const sent=await sendTwilioSMS(to,body);
+    if(sent){
+      // Log as activity
+      S.activities.push({id:uid(),clientId:cid,userId:S.user.id,type:'sms',note:`Text sent: "${body.slice(0,80)}${body.length>80?'…':''}"`,createdAt:new Date().toISOString()});
+      saveDB();S.modal=null;render();
+      notify(`Text sent to ${c?.name||to} ✅`);
+    }else{
+      document.getElementById('sms-send-btn').textContent='💬 Send Text';
+      document.getElementById('sms-send-btn').disabled=false;
+    }
+  });
+
+  // Save SMS template
+  document.getElementById('save-sms-tmpl')?.addEventListener('click',()=>{
+    const id=document.getElementById('save-sms-tmpl').dataset.id;
+    const name=document.getElementById('f-sms-name')?.value?.trim();
+    const cat=document.getElementById('f-sms-cat')?.value||'general';
+    const body=document.getElementById('f-sms-body')?.value||'';
+    if(!name){notify('Template name is required','error');return;}
+    const data={id:id||uid(),name,category:cat,body};
+    if(id){const i=S.smsTemplates.findIndex(x=>x.id===id);if(i>=0)S.smsTemplates[i]=data;else S.smsTemplates.push(data);}
+    else S.smsTemplates.push(data);
+    saveDB();S.modal=null;render();notify(id?'SMS template updated!':'SMS template saved!');
+  });
+
+  // Send checklist email
+  document.getElementById('send-checklist-btn')?.addEventListener('click',async()=>{
+    const to=document.getElementById('f-send-to').value,subj=document.getElementById('f-send-subj').value,body=document.getElementById('f-send-body').value;
+    if(S.apiConfig?.gmail?.enabled){
+      notify('Sending via Gmail...');
+      const sent=await sendGmailEmail(to,subj,body);
+      if(sent){S.modal=null;render();notify('Email sent via Gmail ✅');}
+    }else{
+      const mailto=`mailto:${encodeURIComponent(to)}?subject=${encodeURIComponent(subj)}&body=${encodeURIComponent(body)}`;
+      window.location.href=mailto;
+      S.modal=null;render();notify('Email client opened!');
+    }
+  });
+}
+
+// ─────────────────────────────────────────────
+// SQUARE — look up payments by customer email
+// ─────────────────────────────────────────────
+async function checkSquarePayments(){
+  const cfg=S.apiConfig?.square;
+  if(!cfg?.enabled||!cfg?.accessToken){notify('Square not configured or not enabled.','error');return;}
+  notify('Checking Square for recent payments...');
+  try{
+    const resp=await fetch('https://connect.squareup.com/v2/payments?sort_order=DESC&limit=50',{
+      headers:{'Authorization':`Bearer ${cfg.accessToken}`,'Square-Version':'2024-01-17','Content-Type':'application/json'}
+    });
+    const data=await resp.json();
+    if(!resp.ok){notify(`Square error: ${data.errors?.[0]?.detail||'Unknown'}`,'error');return;}
+    const payments=data.payments||[];
+    let matched=0;
+    payments.forEach(p=>{
+      if(p.status!=='COMPLETED')return;
+      const email=p.buyer_email_address?.toLowerCase();
+      const c=S.clients.find(x=>x.email?.toLowerCase()===email);
+      if(!c)return;
+      // Mark most recent relevant service as paid based on amount
+      const amount=(p.amount_money?.amount||0)/100;
+      const trucks=S.trucks.filter(t=>t.clientId===c.id);
+      trucks.forEach(t=>{
+        if(!t.irsPaid&&amount>=550){t.irsPaid=true;matched++;}
+        else if(!t.dmvPaid&&amount>=100){t.dmvPaid=true;matched++;}
+        else if(!t.carbPaid&&amount>=50){t.carbPaid=true;matched++;}
+      });
+    });
+    saveDB();
+    if(matched>0){render();notify(`Square sync: ${matched} payment(s) marked as paid ✅`);}
+    else notify('Square sync complete — no new matching payments found.');
+  }catch(e){notify(`Square sync failed: ${e.message}`,'error');}
+}
+
+init();
+</script>
+</body>
+</html>
